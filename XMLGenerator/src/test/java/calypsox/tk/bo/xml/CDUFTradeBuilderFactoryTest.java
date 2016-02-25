@@ -26,7 +26,7 @@ public class CDUFTradeBuilderFactoryTest {
         Trade trade = new Trade();
         trade.setProduct(new Swap());
 
-        CDUFTradeBuilder builder = CDUFTradeBuilderFactory.getBuilder(trade);
+        CDUFTradeBuilder builder = CDUFTradeBuilderFactory.getInstance().getBuilder(trade);
         assertNotNull(builder);
         assertTrue(builder instanceof CDUFSwapBuilder);
     }
@@ -39,7 +39,7 @@ public class CDUFTradeBuilderFactoryTest {
         Trade trade = new Trade();
         trade.setProduct(new FRA());
 
-        CDUFTradeBuilder builder = CDUFTradeBuilderFactory.getBuilder(trade);
+        CDUFTradeBuilder builder = CDUFTradeBuilderFactory.getInstance().getBuilder(trade);
         assertNotNull(builder);
         assertTrue(builder instanceof CDUFFraBuilder);
     }
@@ -52,7 +52,7 @@ public class CDUFTradeBuilderFactoryTest {
         Trade trade = new Trade();
         trade.setProduct(new Bond());
 
-        CDUFTradeBuilderFactory.getBuilder(trade);
+        CDUFTradeBuilderFactory.getInstance().getBuilder(trade);
     }
 
 }

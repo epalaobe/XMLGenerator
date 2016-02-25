@@ -28,7 +28,7 @@ public class CDUFDocumentBuilder {
         calypsoTrade.setProduct(product);
 
         fillBOMessageId(msg, calypsoTrade);
-        CDUFTradeBuilder tradeBuilder = CDUFTradeBuilderFactory.getBuilder(trade);
+        CDUFTradeBuilder tradeBuilder = CDUFTradeBuilderFactory.getInstance().getBuilder(trade);
         tradeBuilder.fillTradeHeader(pricingEnv, trade, calypsoTrade);
         tradeBuilder.fillProduct(pricingEnv, trade, product);
 

@@ -8,13 +8,25 @@ import com.calypso.tk.core.Trade;
  */
 public class CDUFTradeBuilderFactory {
 
+	/** The instance. */
+	private static CDUFTradeBuilderFactory INSTANCE = new CDUFTradeBuilderFactory();
+	
+	/**
+	 * Gets the single instance of CDUFTradeBuilderFactory.
+	 *
+	 * @return single instance of CDUFTradeBuilderFactory
+	 */
+	public static CDUFTradeBuilderFactory getInstance() {
+		return INSTANCE;
+	}
+	
     /**
      * Gets the builder.
      *
      * @param trade the trade
      * @return the builder
      */
-    public static CDUFTradeBuilder getBuilder(final Trade trade) {
+    public CDUFTradeBuilder getBuilder(final Trade trade) {
         CDUFTradeBuilder object;
         final Product product = trade.getProduct();
         if (product instanceof com.calypso.tk.product.FRA) {
