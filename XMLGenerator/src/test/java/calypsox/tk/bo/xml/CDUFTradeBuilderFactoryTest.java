@@ -52,7 +52,7 @@ public class CDUFTradeBuilderFactoryTest {
         Trade trade = new Trade();
         trade.setProduct(new Bond());
 
-        CDUFTradeBuilder builder = CDUFTradeBuilderFactory.getBuilder(trade);
+        CDUFTradeBuilderFactory.getBuilder(trade);
     }
 
 }

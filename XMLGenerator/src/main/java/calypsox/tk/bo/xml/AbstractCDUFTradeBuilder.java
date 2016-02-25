@@ -67,17 +67,18 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 		calypsoTrade.setHolidayCode(getHolidayCode(trade.getProduct())); // required
 		calypsoTrade.setTradeBundleName(getTradeBundle(trade.getBundle())); // required
 		calypsoTrade.setTradeBundleType(getTradeBundleType(trade.getBundle())); // required
-//		calypsoTrade.setTradeBundleOneMsg(getTradeBundleOneMessage(trade.getBundle()));
+		calypsoTrade.setTradeBundleOneMsg(getTradeBundleOneMessage(trade.getBundle()));
 		calypsoTrade.setMarketType(trade.getMarketType());
 		calypsoTrade.setMaturityDate(getXmlGregorianCalendarFromDate(trade.getMaturityDate()));
 		calypsoTrade.setMirrorBook(getBook(trade.getMirrorBook()));
 		calypsoTrade.setNegotiatedCurrency(trade.getNegotiatedCurrency());
-//		calypsoTrade.setMarketPlace(getCounterPartyCountry(trade.getCounterParty()));
+		calypsoTrade.setMarketPlace(getCounterPartyCountry(trade.getCounterParty()));
 
 		calypsoTrade.setProductSubType(trade.getProductSubType()); // required //nillable
 		calypsoTrade.setTradeId(Integer.valueOf(trade.getId())); // required //nillable
 		calypsoTrade.setTradeKeywords(getTradeKeywords(trade));
 
+		calypsoTrade.setReconventionList(getReconventionList(trade.getProduct()));
 		// TODO: calypsoTrade.setTemplateName(); //required
 		// TODO: calypsoTrade.setAllegeActionB();
 		// TODO: calypsoTrade.setCancelAction();
@@ -158,9 +159,9 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 	 * @param product the product
 	 * @return the ReconventionList of product
 	 */
-	/*com.calypso.tk.upload.jaxb.ReconventionList getReconventionList(final com.calypso.tk.core.Product product) {
-		com.calypso.tk.upload.jaxb.ReconventionList holidayCode = new com.calypso.tk.upload.jaxb.ReconventionList();
-		List<com.calypso.tk.upload.jaxb.ReconventionDetails> listReconventionDetails = holidayCode.getReconventionDetails();
+	com.calypso.tk.upload.jaxb.ReconventionList getReconventionList(final com.calypso.tk.core.Product product) {
+		com.calypso.tk.upload.jaxb.ReconventionList reconventionList = new com.calypso.tk.upload.jaxb.ReconventionList();
+		List<com.calypso.tk.upload.jaxb.ReconventionDetails> listReconventionDetails = reconventionList.getReconventionDetails();
 		List<Reconvention> reconventions = ReconventionUtil.getReconventions(product);
 
 		for (Reconvention reconvention : reconventions) {
@@ -174,7 +175,7 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 			listReconventionDetails.add(reconventionDetails);
 		}
 		return null;
-	}*/
+	}
 
 	/**
 	 * Fill Parameters Object with reconvention data.
@@ -182,7 +183,7 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 	 * @param reconvention the reconvention
 	 * @return the Parameters Object with reconvention data.
 	 */
-	/*Parameters getReconventionParameters(final Reconvention reconvention) {
+	Parameters getReconventionParameters(final Reconvention reconvention) {
 		Parameters parameters = new Parameters();
 		List<Parameter> listParameters = parameters.getParameter();
 		List<ReconventionParameter<?>> reconventionParameters = reconvention.getReconventionParameters();
@@ -193,7 +194,7 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 			listParameters.add(parameter);
 		}
 		return parameters;
-	}*/
+	}
 
 	CashFlows getCashflows(final PricingEnv pricingEnv, final com.calypso.tk.core.Product product) {
 		CashFlows cashflows = new CashFlows();
@@ -351,22 +352,28 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 		}
 		return null;
 	}
-	
-	int twentyFourHourTimeToMilliseconds(int time) {
-	     int hours = time / 100;
-	     int minutes = time % 100;
-	     return ((hours * 60) + minutes) * 60000;
-	 }
-	
+
+	/**
+	 * @param time the time in millis
+	 * @return the XMLGregorianCalendar object with time data.
+	 */
 	XMLGregorianCalendar getXmlGregorianCalendarFromTime(final int time) {
-			GregorianCalendar calendar = new GregorianCalendar();
-			calendar.setTimeInMillis(time);
-			try {
-				return DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);
-			} catch (DatatypeConfigurationException e) {
-				Log.error(this, e.getMessage());
-				return null;
-			}
+		GregorianCalendar calendar = new GregorianCalendar();
+		calendar.setTimeInMillis(time);
+		try {
+			return DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);
+		} catch (DatatypeConfigurationException e) {
+			Log.error(this, e.getMessage());
+			return null;
+		}
+	}
+	
+	/**
+	 * @param time the Time in format int.
+	 * @return the time in millis
+	 */
+	int twentyFourHourTimeToMilliseconds(final int time) {
+		return (((time / 100) * 60) + (time % 100)) * 60000;
 	}
 
 }

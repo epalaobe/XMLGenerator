@@ -29,13 +29,13 @@ public class CDUFSwapBuilder extends AbstractCDUFProductBuilder {
 
 		jaxbSwap.setExerciseType(swap.getExerciseType());
 		jaxbSwap.setFxRate(swap.getInitialFXRate()); //required //nillable
-		// TODO: jaxbSwap.setMarkToMarket(); //required //nillable
 		jaxbSwap.setIndexResetDate(getIndexResetDate(swap)); //required //nillable
-		// TODO: jaxbSwap.setMToMAdjFirst(swap.getAdjustFirstFlowB()); //required //nillable
 		List<com.calypso.tk.upload.jaxb.SwapLeg> swapLegList = jaxbSwap.getSwapLeg();
 		fillLegs(swap, swapLegList); //required
 
-
+		// TODO: jaxbSwap.setMarkToMarket(); //required //nillable
+		// TODO: jaxbSwap.setMToMAdjFirst(swap.getAdjustFirstFlowB()); //required //nillable
+		
 		// TODO: jaxbSwap.setAutoAdjustStubB(value);
 		// TODO: jaxbSwap.setDiscounted(value);
 		// TODO: jaxbSwap.setExerciseSchedule(value);
@@ -67,7 +67,7 @@ public class CDUFSwapBuilder extends AbstractCDUFProductBuilder {
 	}
 
 	private void fillCashSettleInfo(final CalypsoTrade calypsoTrade, final com.calypso.tk.product.Swap swap) {
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings("unchecked") 
 		Vector<CashSettleInfo> tradeCashSettleInfo = swap.getCashSettleInfo();
 		if (!tradeCashSettleInfo.isEmpty()) {
 
@@ -109,15 +109,13 @@ public class CDUFSwapBuilder extends AbstractCDUFProductBuilder {
 		jaxbSwapLeg.setRateIndex(getRateIndex(swapLeg.getRateIndex()));
 		jaxbSwapLeg.setRateIndexSource(getRateIndexSource(swapLeg.getRateIndex()));
 		jaxbSwapLeg.setSpread(swapLeg.getSpread());
-		// TODO: jaxbSwapLeg.setRate()//required //Rate en cuanto se contrata
-		//jaxbSwapLeg.setFixedRate(swapLeg.getAmortRate()); //Rate de la pata fija 4%
+		jaxbSwapLeg.setFixedRate(swapLeg.getAmortRate()); //Rate de la pata fija 4%
 		jaxbSwapLeg.setTenor(getTenor(swapLeg.getRateIndex())); //required
 		jaxbSwapLeg.setCurrency(swapLeg.getCurrency());
 		jaxbSwapLeg.setSpecificFirstDate(getXmlGregorianCalendarFromDate(swapLeg.getFirstStubDate())); //required
 		jaxbSwapLeg.setSpecificLastDate(getXmlGregorianCalendarFromDate(swapLeg.getLastStubDate())); //required
 		jaxbSwapLeg.setStartDate(getXmlGregorianCalendarFromDate(swapLeg.getStartDate()));
 		jaxbSwapLeg.setEndDate(getXmlGregorianCalendarFromDate(swapLeg.getEndDate()));
-		// TODO: jaxbSwapLeg.setInterestCompounding(getCompoundMethod(swapLeg.getCompoundMethod())); //required
 		jaxbSwapLeg.setInterestCompoundingMethod(getCompoundMethod(swapLeg.getCompoundMethod())); //required
 		jaxbSwapLeg.setInterestCompoundingFrequency(getFrequency(swapLeg.getCompoundFrequency())); //required
 		jaxbSwapLeg.setResetRoll(getDateRoll(swapLeg.getResetDateRoll()));
@@ -127,16 +125,24 @@ public class CDUFSwapBuilder extends AbstractCDUFProductBuilder {
 		@SuppressWarnings("unchecked")
         Vector<String> resetHolidays = swapLeg.getResetHolidays();
 		jaxbSwapLeg.setResetHolidays(getHolidayCodeTypeFromVector(resetHolidays));
-		// TODO: jaxbSwapLeg.setResetFrequency(); //required
 		jaxbSwapLeg.setResetLag(getResetLag(swapLeg.getResetOffset(), swapLeg.getDefaultResetOffsetB(), swapLeg.getRateIndex())); //required
-		// TODO: jaxbSwapLeg.setResetMethod(); //required
-		// TODO: jaxbSwapLeg.setFloatingRateReset(); //required //fijacion de la tasa variable  Euribor 6 Meses VALOR DEL CALCULO TOTAL
-		// TODO: jaxbSwapLeg.setAmountsRounding(); //required
 		jaxbSwapLeg.setRatesRounding(swapLeg.getParamValue("RATE_ROUNDING")); //required
 		jaxbSwapLeg.setRatesRoundingDecPlaces(parseStringToInteger(swapLeg.getParamValue("RATE_ROUNDING_DEC"))); //required
-		// TODO: jaxbSwapLeg.setFirstReset(swapLeg.get); //required //dia de fijacion del la pata variable. START - RESETLAG
 		jaxbSwapLeg.setFirstRate(String.valueOf(swapLeg.getFirstResetRate())); //required //Fijacion de primer flujo pata variable. 
 		jaxbSwapLeg.setFixedAmount(swapLeg.getFixedAmount());
+
+		// TODO: jaxbSwapLeg.setInterestCompounding(); //required
+		
+
+		// TODO: jaxbSwapLeg.setResetFrequency(); //required
+
+		// TODO: jaxbSwapLeg.setResetMethod(); //required
+		// TODO: jaxbSwapLeg.setAmountsRounding(); //required
+		
+		// TODO: jaxbSwapLeg.setRate()//required //Rate en cuanto se contrata
+		// TODO: jaxbSwapLeg.setFloatingRateReset(); //required //fijacion de la tasa variable  Euribor 6 Meses VALOR DEL CALCULO TOTAL
+		// TODO: jaxbSwapLeg.setFirstReset(swapLeg.get); //required //dia de fijacion del la pata variable. START - RESETLAG
+		
 		swapLegList.add(jaxbSwapLeg);
 	}
 

@@ -19,7 +19,6 @@ public class CDUFSimpleTransferBuilder extends AbstractCDUFProductBuilder {
 		com.calypso.tk.upload.jaxb.SimpleTransfer jaxbSimpleTransfer = new com.calypso.tk.upload.jaxb.SimpleTransfer();
 		jaxbProduct.setSimpleTransfer(jaxbSimpleTransfer);
 
-		jaxbSimpleTransfer.setLinkedId(simpleTransfer.getLinkedId());
 		jaxbSimpleTransfer.setType(simpleTransfer.getType()); //required
 		jaxbSimpleTransfer.setSimpleTransferType(simpleTransfer.getSubType()); //required
 		jaxbSimpleTransfer.setSimpleTransferSecurity(getSimpleTransferSecurity(simpleTransfer)); //required
@@ -36,7 +35,6 @@ public class CDUFSimpleTransferBuilder extends AbstractCDUFProductBuilder {
 		com.calypso.tk.product.SimpleTransfer simpleTransfer = (com.calypso.tk.product.SimpleTransfer) trade.getProduct();
 		calypsoTrade.setTradeNotional(simpleTransfer.getPrincipal());
 		calypsoTrade.setProductType("SimpleTransfer");
-
 	}
 
 	private SimpleTransferSecurity getSimpleTransferSecurity(final com.calypso.tk.product.SimpleTransfer simpleTransfer){

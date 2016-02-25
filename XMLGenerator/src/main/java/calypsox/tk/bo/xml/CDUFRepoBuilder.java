@@ -1,7 +1,6 @@
 package calypsox.tk.bo.xml;
 
 import java.util.List;
-import java.util.Vector;
 
 import com.calypso.tk.core.Trade;
 import com.calypso.tk.marketdata.PricingEnv;
@@ -71,12 +70,8 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 			repoFunding.setPrincipal(cash.getPrincipal());
 			repoFunding.setCouponFrequency(getFrequency(cash.getPaymentFrequency())); //required
 			repoFunding.setFundingType(cash.getRateType()); //required
-			repoFunding.setDiscountMethod(cash.getDiscountMethodAsString());
 			repoFunding.setFundingRate(cash.getFixedRate());
 			repoFunding.setIndexFactor(cash.getIndexFactor());
-			@SuppressWarnings("unchecked")
-			Vector<String> paymentHolidays = cash.getPaymentHolidays();
-			repoFunding.setPaymentHolidays(getHolidayCodeTypeFromVector(paymentHolidays));
 			
 			if(repo.isJGB()){
 				com.calypso.tk.product.JGBRepo jgbRepo = (com.calypso.tk.product.JGBRepo)repo;
