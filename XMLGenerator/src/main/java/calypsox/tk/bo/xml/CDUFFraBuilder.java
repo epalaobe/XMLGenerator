@@ -21,7 +21,7 @@ public class CDUFFraBuilder extends AbstractCDUFProductBuilder {
         com.calypso.tk.product.FRA fra = (com.calypso.tk.product.FRA) trade.getProduct();
         com.calypso.tk.upload.jaxb.FRA jaxbFra = new com.calypso.tk.upload.jaxb.FRA();
         jaxbProduct.setFRA(jaxbFra);
-
+        
         jaxbFra.setDiscountMethod(fra.getDiscountMethod());
         jaxbFra.setInterpFromIndexTenor(getTenor(fra.getInterpFromIndex()));
         jaxbFra.setInterpolatedB(Boolean.valueOf(fra.getInterpolatedB()));
@@ -30,7 +30,7 @@ public class CDUFFraBuilder extends AbstractCDUFProductBuilder {
         jaxbFra.setPaymentDayCount(getRateIndexDayCount(fra.getRateIndex())); // required
         jaxbFra.setBeginDateRoll(getDateRoll(fra.getPaymentBeginDateRoll())); // required
         jaxbFra.setEndDateRoll(getDateRoll(fra.getPaymentEndDateRoll())); // required
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings("unchecked") 
         Vector<String> paymentBeginHolidays = fra.getPaymentBeginHolidays();
         jaxbFra.setBeginHolidayCode(getHolidayCodeTypeFromVector(paymentBeginHolidays)); // required
         @SuppressWarnings("unchecked")
@@ -59,6 +59,7 @@ public class CDUFFraBuilder extends AbstractCDUFProductBuilder {
         calypsoTrade.setTradeNotional(fra.getNotional());
         calypsoTrade.setStartDate(getXmlGregorianCalendarFromDate(fra.getStartDate()));
         calypsoTrade.setProductType("FRA");
+   
     }
 
 }

@@ -1,5 +1,6 @@
 package calypsox.tk.bo.xml;
 
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
@@ -12,6 +13,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import com.calypso.jaxb.xml.Audit;
 import com.calypso.tk.core.Book;
 import com.calypso.tk.core.CashFlow;
 import com.calypso.tk.core.CashFlowSet;
@@ -77,8 +79,10 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 		calypsoTrade.setProductSubType(trade.getProductSubType()); // required //nillable
 		calypsoTrade.setTradeId(Integer.valueOf(trade.getId())); // required //nillable
 		calypsoTrade.setTradeKeywords(getTradeKeywords(trade));
-
+		
 		calypsoTrade.setReconventionList(getReconventionList(trade.getProduct()));
+		calypsoTrade.setCashFlows(getCashflows(pricingEnv, trade.getProduct()));
+		
 		// TODO: calypsoTrade.setTemplateName(); //required
 		// TODO: calypsoTrade.setAllegeActionB();
 		// TODO: calypsoTrade.setCancelAction();
@@ -91,8 +95,38 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 		// TODO: calypsoTrade.setFeeReRate();
 		// TODO: calypsoTrade.setInterestCleanup();
 		// TODO: calypsoTrade.setTradeEventsInSameBundle();
+		
+		// Trade Status and Audit
+		com.calypso.jaxb.xml.Trade trade2 = new com.calypso.jaxb.xml.Trade();
+		trade.setStatus(trade.getStatus());
+		trade2.setAuditInfo(getAudit(trade.getEnteredUser(), trade.getEnteredDate()));
 	}
 
+
+	/**
+	 * @param user the EnteredBy user
+	 * @param dateEntered the jdatetime
+	 * @return the Audit jaxb object
+	 */
+	Audit getAudit(final String user, final JDatetime dateEntered){
+		Audit result = new Audit();
+		result.setEnteredBy(user);
+		result.setDateEntered(parseJDatetimeToCalender(dateEntered));
+		return result;
+	}
+
+	/**
+	 * @param datetime the jdatetime
+	 * @return the Calendar object with jdatetime data.
+	 */
+	Calendar parseJDatetimeToCalender(final JDatetime datetime){
+		Calendar result = null;
+		if (datetime != null) {
+			result = Calendar.getInstance();
+			result.setTime(datetime);
+		}
+		return result;
+	}
 
 	/**
 	 * @param legalEntity the legal entity
@@ -367,7 +401,7 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * @param time the Time in format int.
 	 * @return the time in millis

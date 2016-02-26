@@ -17,7 +17,7 @@ public class CDUFDocumentBuilder {
      * @param pricingEnv the pricing env
      * @param trade the trade
      * @param msg the msg
-     * @return the calypso document
+     * @return the calypso document auditinfo
      */
     public CalypsoUploadDocument buildCalypsoDocument(final PricingEnv pricingEnv, final Trade trade, final BOMessage msg) {
         CalypsoUploadDocument doc = new CalypsoUploadDocument();
@@ -26,7 +26,7 @@ public class CDUFDocumentBuilder {
         doc.getCalypsoTrade().add(calypsoTrade);
         Product product = new Product();
         calypsoTrade.setProduct(product);
-
+        
         fillBOMessageId(msg, calypsoTrade);
         CDUFTradeBuilder tradeBuilder = CDUFTradeBuilderFactory.getInstance().getBuilder(trade);
         tradeBuilder.fillTradeHeader(pricingEnv, trade, calypsoTrade);
@@ -45,7 +45,7 @@ public class CDUFDocumentBuilder {
         CustomData data = new CustomData();
         data.setName("CalypsoMessageId");
         data.setValue(Integer.toString(msg.getId()));
-
+        
         CustomDataList customDataList = new CustomDataList();
         customDataList.getCustomData().add(data);
 
