@@ -17,18 +17,18 @@ public class CDUFDocumentBuilder {
      * @param pricingEnv the pricing env
      * @param trade the trade
      * @param msg the msg
-     * @return the calypso document auditinfo
+     * @return the calypso document
      */
     public CalypsoUploadDocument buildCalypsoDocument(final PricingEnv pricingEnv, final Trade trade, final BOMessage msg) {
-        CalypsoUploadDocument doc = new CalypsoUploadDocument();
+        final CalypsoUploadDocument doc = new CalypsoUploadDocument();
 
-        CalypsoTrade calypsoTrade = new CalypsoTrade();
+        final CalypsoTrade calypsoTrade = new CalypsoTrade();
         doc.getCalypsoTrade().add(calypsoTrade);
-        Product product = new Product();
+        final Product product = new Product();
         calypsoTrade.setProduct(product);
-        
-        fillBOMessageId(msg, calypsoTrade);
-        CDUFTradeBuilder tradeBuilder = CDUFTradeBuilderFactory.getInstance().getBuilder(trade);
+
+        fillBOMessageHeader(msg, trade, calypsoTrade);
+        final CDUFTradeBuilder tradeBuilder = CDUFTradeBuilderFactory.getInstance().getBuilder(trade);
         tradeBuilder.fillTradeHeader(pricingEnv, trade, calypsoTrade);
         tradeBuilder.fillProduct(pricingEnv, trade, product);
 
@@ -41,15 +41,22 @@ public class CDUFDocumentBuilder {
      * @param msg the msg
      * @param doc the method modifies the doc to add the boMessageId
      */
-    private void fillBOMessageId(final BOMessage msg, final CalypsoTrade doc) {
-        CustomData data = new CustomData();
-        data.setName("CalypsoMessageId");
-        data.setValue(Integer.toString(msg.getId()));
-        
-        CustomDataList customDataList = new CustomDataList();
-        customDataList.getCustomData().add(data);
-
+    private void fillBOMessageHeader(final BOMessage msg, Trade trade, final CalypsoTrade doc) {
+        final CustomDataList customDataList = new CustomDataList();
         doc.setCustomDataList(customDataList);
+
+        customDataList.getCustomData().add(createCustomData("CalypsoMessageId", Integer.toString(msg.getId())));
+        customDataList.getCustomData().add(createCustomData("MessageAction", msg.getAction().toString()));
+        customDataList.getCustomData().add(createCustomData("MessageSubAction", msg.getSubAction().toString()));
+        customDataList.getCustomData().add(createCustomData("ProcessingOrganization", trade.getBook().getLegalEntity().getCode()));
+        customDataList.getCustomData().add(createCustomData("TradeStatus", trade.getStatus().toString()));
+        customDataList.getCustomData().add(createCustomData("TradeEnteredUser", trade.getEnteredUser()));        
     }
 
+    private CustomData createCustomData(final String name, final String value) {
+        final CustomData data = new CustomData();
+        data.setName(name);
+        data.setValue(value);
+        return data;
+    }
 }
