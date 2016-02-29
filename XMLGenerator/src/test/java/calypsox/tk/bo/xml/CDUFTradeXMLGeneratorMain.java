@@ -17,53 +17,62 @@ import com.calypso.tk.util.TradeArray;
 
 public class CDUFTradeXMLGeneratorMain {
 
-    private static String OUTPUT_DIR = "c:\\tmp\\xml";
-    // private static String SQL = "product_desc.product_type IN (\'FRA\',\'Repo\',\'SimpleTransfer\',\'Swap\')";
-    private static String SQL = "product_desc.product_type  IN (\'FRA\',\'Repo\',\'Swap\')";
+	private static final String[] productType = { "FRA", "Repo", "SimpleTransfer", "Swap" };
 
-    public static void main(final String[] args) throws Exception {
-        DSConnection dsConnection = ConnectionUtil.connect(args, "MainEntry");
-        final PricingEnv pricingEnv = DSConnection.getDefault().getRemoteMarketData().getPricingEnv("OFFICIAL"); // RISK V14.0
+	private static String OUTPUT_DIR = "c:\\tmp\\xml";
+	private static String SQL = "product_desc.product_type  IN (\'TYPE\')";
 
-        // generateMsgFromTrades(dsConnection, pricingEnv);
-        generateMsgFromMsgs(dsConnection, pricingEnv);
-    }
+	public static void main(final String[] args) throws Exception {
+		DSConnection dsConnection = ConnectionUtil.connect(args, "MainEntry");
+		final PricingEnv pricingEnv = DSConnection.getDefault().getRemoteMarketData().getPricingEnv("OFFICIAL"); // RISK
+																													// V14.0
 
-    private static void generateMsgFromTrades(final DSConnection dsConnection, final PricingEnv pricingEnv) throws CalypsoServiceException, MessageFormatException, IOException {
-        BOMessage msg = new BOMessage();
+		generateMsgFromTrades(dsConnection, pricingEnv);
+		// generateMsgFromMsgs(dsConnection, pricingEnv);
+	}
 
-        TradeFilter tf = new TradeFilter();
-        tf.setSQLWhereClause(SQL);
-        TradeArray array = dsConnection.getRemoteTrade().getTrades(tf, new JDatetime());
+	private static void generateMsgFromTrades(final DSConnection dsConnection, final PricingEnv pricingEnv)
+			throws CalypsoServiceException, MessageFormatException, IOException {
+		BOMessage msg = new BOMessage();
 
-        int n = array.size();
-        for (int i = 0; i < n; i++) {
-            Trade trade = array.get(i);
+		TradeFilter tf = new TradeFilter();
+		for (String type : productType) {
+			String sql = SQL.replaceAll("TYPE", type);
+			tf.setSQLWhereClause(sql);
+			TradeArray array = dsConnection.getRemoteTrade().getTrades(tf, new JDatetime());
 
-            msg.setTradeId(trade.getId());
-            StringBuffer stringBuffer = new CDUFTradeXMLGenerator().generate(pricingEnv, msg, dsConnection);
+			int n = array.size();
+			for (int i = 0; i < n; i++) {
+				Trade trade = array.get(i);
 
-            FileWriter writer = new FileWriter(OUTPUT_DIR + '\\' + trade.getProductType() + '_' + trade.getId() + ".xml");
-            writer.write(stringBuffer.toString());
-            writer.close();
-            System.out.println("Generado " + i + " de " + n);
-        }
-    }
+				msg.setTradeId(trade.getId());
+				StringBuffer stringBuffer = new CDUFTradeXMLGenerator().generate(pricingEnv, msg, dsConnection);
 
-    private static void generateMsgFromMsgs(final DSConnection dsConnection, final PricingEnv pricingEnv) throws CalypsoServiceException, MessageFormatException, IOException {
-        MessageArray array = dsConnection.getRemoteBackOffice().getMessages("TEMPLATE_NAME=\'rtce_template.txt\'");
+				FileWriter writer = new FileWriter(
+						OUTPUT_DIR + '\\' + trade.getProductType() + '_' + trade.getId() + ".xml");
+				writer.write(stringBuffer.toString());
+				writer.close();
+				System.out.println("Generado " + i + " de " + n);
+			}
+		}
+	}
 
-        int n = array.size();
-        for (int i = 0; i < n; i++) {
-            BOMessage msg = array.get(i);
+	private static void generateMsgFromMsgs(final DSConnection dsConnection, final PricingEnv pricingEnv)
+			throws CalypsoServiceException, MessageFormatException, IOException {
+		MessageArray array = dsConnection.getRemoteBackOffice().getMessages("TEMPLATE_NAME=\'rtce_template.txt\'");
 
-            StringBuffer stringBuffer = new CDUFTradeXMLGenerator().generate(pricingEnv, msg, dsConnection);
+		int n = array.size();
+		for (int i = 0; i < n; i++) {
+			BOMessage msg = array.get(i);
 
-            FileWriter writer = new FileWriter(OUTPUT_DIR + '\\' + msg.getProductType() + '_' + msg.getTradeId() + ".xml");
-            writer.write(stringBuffer.toString());
-            writer.close();
-            System.out.println("Generado " + i + " de " + n);
-        }
-    }
+			StringBuffer stringBuffer = new CDUFTradeXMLGenerator().generate(pricingEnv, msg, dsConnection);
+
+			FileWriter writer = new FileWriter(
+					OUTPUT_DIR + '\\' + msg.getProductType() + '_' + msg.getTradeId() + ".xml");
+			writer.write(stringBuffer.toString());
+			writer.close();
+			System.out.println("Generado " + i + " de " + n);
+		}
+	}
 
 }

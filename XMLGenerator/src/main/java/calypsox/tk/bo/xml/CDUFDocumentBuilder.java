@@ -41,16 +41,20 @@ public class CDUFDocumentBuilder {
      * @param msg the msg
      * @param doc the method modifies the doc to add the boMessageId
      */
-    private void fillBOMessageHeader(final BOMessage msg, Trade trade, final CalypsoTrade doc) {
+    private void fillBOMessageHeader(final BOMessage msg, final Trade trade, final CalypsoTrade doc) {
         final CustomDataList customDataList = new CustomDataList();
         doc.setCustomDataList(customDataList);
 
         customDataList.getCustomData().add(createCustomData("CalypsoMessageId", Integer.toString(msg.getId())));
-        customDataList.getCustomData().add(createCustomData("MessageAction", msg.getAction().toString()));
-        customDataList.getCustomData().add(createCustomData("MessageSubAction", msg.getSubAction().toString()));
+        if (msg.getAction() != null) {
+            customDataList.getCustomData().add(createCustomData("MessageAction", msg.getAction().toString()));
+        }
+        if (msg.getSubAction() != null) {
+            customDataList.getCustomData().add(createCustomData("MessageSubAction", msg.getSubAction().toString()));
+        }
         customDataList.getCustomData().add(createCustomData("ProcessingOrganization", trade.getBook().getLegalEntity().getCode()));
         customDataList.getCustomData().add(createCustomData("TradeStatus", trade.getStatus().toString()));
-        customDataList.getCustomData().add(createCustomData("TradeEnteredUser", trade.getEnteredUser()));        
+        customDataList.getCustomData().add(createCustomData("TradeEnteredUser", trade.getEnteredUser()));
     }
 
     private CustomData createCustomData(final String name, final String value) {
