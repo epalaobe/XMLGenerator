@@ -2,6 +2,9 @@ package calypsox.tk.bo.xml;
 
 import java.util.List;
 
+import com.calypso.tk.core.CashFlowSet;
+import com.calypso.tk.core.FlowGenerationException;
+import com.calypso.tk.core.JDate;
 import com.calypso.tk.core.Trade;
 import com.calypso.tk.marketdata.PricingEnv;
 import com.calypso.tk.secfinance.SecFinanceTkUtil;
@@ -49,10 +52,12 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 	 */
 	@Override
 	public void fillTradeHeader(final PricingEnv pricingEnv, final Trade trade, final CalypsoTrade calypsoTrade) {
+        super.fillTradeHeader(pricingEnv, trade, calypsoTrade);
 		com.calypso.tk.product.Repo repo = (com.calypso.tk.product.Repo) trade.getProduct();
+		calypsoTrade.setCashFlows(getCashflows(pricingEnv, repo));
 		calypsoTrade.setTradeNotional(repo.getPrincipal());
 		calypsoTrade.setStartDate(getXmlGregorianCalendarFromDate(repo.getStartDate()));
-        calypsoTrade.setProductType("Repo");
+		calypsoTrade.setProductType("Repo");
 
 	}
 
@@ -63,7 +68,7 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 
 		if(cash!=null){
 			repoFunding.setCurrency(cash.getCurrency()); //required
-			repoFunding.setDayCountConvention(repo.getDayCount().toString()); //required
+			repoFunding.setDayCountConvention(getDayCount(repo.getDayCount())); //required
 			repoFunding.setRateIndex(getRateIndex(cash.getRateIndex())); //required
 			repoFunding.setRateIndexSource(getRateIndexSource(cash.getRateIndex())); //required
 			repoFunding.setTenor(getTenor(cash.getRateIndex())); //required
@@ -72,7 +77,7 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 			repoFunding.setFundingType(cash.getRateType()); //required
 			repoFunding.setFundingRate(cash.getFixedRate());
 			repoFunding.setIndexFactor(cash.getIndexFactor());
-			
+
 			if(repo.isJGB()){
 				com.calypso.tk.product.JGBRepo jgbRepo = (com.calypso.tk.product.JGBRepo)repo;
 				repoFunding.setJGBType(jgbRepo.getType()); //required //nillable
@@ -106,31 +111,31 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 		return substitutionDetails;
 
 	}
-	
+
 	private SecurityDetails getSecurityDetails(final com.calypso.tk.product.Repo repo){
 		SecurityDetails securityDetails = new SecurityDetails();
-		
+
 		// TODO: securityDetails.setFXPrimaryCurrency(repo.get);
 		// TODO: securityDetails.setMarginFlagB(value);
 		securityDetails.setBondDetails(getBondDetails(repo));
 		securityDetails.setEquityDetails(getEquityDetails(repo));
-		
+
 		return securityDetails;
 	}
-	
+
 	private BondDetails getBondDetails(final com.calypso.tk.product.Repo repo){
 		BondDetails bondDetails = new BondDetails();
 		List<BondDetail> listBondDetails = bondDetails.getBondDetail();
 		// TODO: fill list
-		
+
 		return bondDetails;
 	}
-	
+
 	private EquityDetails getEquityDetails(final com.calypso.tk.product.Repo repo){
 		EquityDetails equityDetails = new EquityDetails();
 		List<EquityDetail> listEquityDetails = equityDetails.getEquityDetail();
 		// TODO:  fill list
-		
+
 		return equityDetails;
 	}
 

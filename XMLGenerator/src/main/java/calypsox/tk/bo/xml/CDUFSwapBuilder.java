@@ -59,6 +59,7 @@ public class CDUFSwapBuilder extends AbstractCDUFProductBuilder {
 	public void fillTradeHeader(final PricingEnv pricingEnv, final Trade trade, final CalypsoTrade calypsoTrade) {
 		super.fillTradeHeader(pricingEnv, trade, calypsoTrade);
 		com.calypso.tk.product.Swap swap = (com.calypso.tk.product.Swap) trade.getProduct();
+		calypsoTrade.setCashFlows(getCashflows(pricingEnv, swap));
 		calypsoTrade.setTradeNotional(swap.getPrincipal());
 		calypsoTrade.setStartDate(getXmlGregorianCalendarFromDate(swap.getStartDate()));
 		calypsoTrade.setProductType("InterestRateSwap");

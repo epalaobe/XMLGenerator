@@ -56,11 +56,15 @@ public class CDUFFraBuilderTest {
 
 		com.calypso.tk.upload.jaxb.Product jaxbProduct = new com.calypso.tk.upload.jaxb.Product();
 		
+		assertNotNull(jaxbProduct);
+		
 		CDUFFraBuilder builder = new CDUFFraBuilder();
 		builder.fillProduct(pricingEnv, trade, jaxbProduct);
 		
 		com.calypso.tk.upload.jaxb.FRA jaxbFra = jaxbProduct.getFRA();
         
+		assertNotNull(jaxbFra);
+		
 		assertNotNull(jaxbFra.isSettleInArrears());
 		assertNotNull(jaxbFra.getDiscountMethod());
 		assertNotNull(jaxbFra.getRate());

@@ -32,6 +32,7 @@ public class CDUFSimpleTransferBuilder extends AbstractCDUFProductBuilder {
 	 */
 	@Override
 	public void fillTradeHeader(final PricingEnv pricingEnv, final Trade trade, final CalypsoTrade calypsoTrade) {
+        super.fillTradeHeader(pricingEnv, trade, calypsoTrade);
 		com.calypso.tk.product.SimpleTransfer simpleTransfer = (com.calypso.tk.product.SimpleTransfer) trade.getProduct();
 		calypsoTrade.setTradeNotional(simpleTransfer.getPrincipal());
 		calypsoTrade.setProductType("SimpleTransfer");
