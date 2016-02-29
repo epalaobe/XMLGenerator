@@ -12,30 +12,26 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import com.calypso.tk.core.Book;
 import com.calypso.tk.core.CashFlow;
 import com.calypso.tk.core.CashFlowSet;
 import com.calypso.tk.core.FlowGenerationException;
 import com.calypso.tk.core.JDate;
-import com.calypso.tk.core.JDatetime;
-import com.calypso.tk.core.LegalEntity;
 import com.calypso.tk.core.Log;
 import com.calypso.tk.core.Trade;
 import com.calypso.tk.core.TradeBundle;
 import com.calypso.tk.marketdata.PricingEnv;
-import com.calypso.tk.product.reconvention.Reconvention;
-import com.calypso.tk.product.reconvention.ReconventionParameter;
-import com.calypso.tk.product.reconvention.impl.ReconventionUtil;
 import com.calypso.tk.upload.jaxb.CalypsoTrade;
 import com.calypso.tk.upload.jaxb.CashFlows;
 import com.calypso.tk.upload.jaxb.HolidayCode;
 import com.calypso.tk.upload.jaxb.Keyword;
-import com.calypso.tk.upload.jaxb.Parameter;
-import com.calypso.tk.upload.jaxb.Parameters;
 import com.calypso.tk.upload.jaxb.TradeKeywords;
 
 public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 
+    private static final int HUNDRED = 7;
+    private static final int SIXTY = 7;
+    private static final int SIXTY_THOUSAND = 7;
+	
 	/**
 	 * Fill some data header that are general to all trades.
 	 *
@@ -98,7 +94,7 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 	 * @param legalEntity the legal entity
 	 * @return the String with legal entity country name.
 	 */
-	String getCounterPartyCountry(final LegalEntity legalEntity) {
+	String getCounterPartyCountry(final com.calypso.tk.core.LegalEntity legalEntity) {
 		if (legalEntity != null) {
 			return legalEntity.getCountry();
 		}
@@ -122,7 +118,7 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 	 * @param jDateTime the JDateTime
 	 * @return the JDate Object
 	 */
-	JDate getTradeDateJDate(final JDatetime jDateTime){
+	JDate getTradeDateJDate(final com.calypso.tk.core.JDatetime jDateTime){
 		if(jDateTime!=null){
 			return jDateTime.getJDate(null);
 		}
@@ -162,9 +158,9 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 	com.calypso.tk.upload.jaxb.ReconventionList getReconventionList(final com.calypso.tk.core.Product product) {
 		com.calypso.tk.upload.jaxb.ReconventionList reconventionList = new com.calypso.tk.upload.jaxb.ReconventionList();
 		List<com.calypso.tk.upload.jaxb.ReconventionDetails> listReconventionDetails = reconventionList.getReconventionDetails();
-		List<Reconvention> reconventions = ReconventionUtil.getReconventions(product);
+		List<com.calypso.tk.product.reconvention.Reconvention> reconventions = com.calypso.tk.product.reconvention.impl.ReconventionUtil.getReconventions(product);
 
-		for (Reconvention reconvention : reconventions) {
+		for (com.calypso.tk.product.reconvention.Reconvention reconvention : reconventions) {
 			com.calypso.tk.upload.jaxb.ReconventionDetails reconventionDetails = new com.calypso.tk.upload.jaxb.ReconventionDetails();
 			reconventionDetails.setEffectiveDate(getXmlGregorianCalendarFromDate(reconvention.getEffectiveDate()));
 			reconventionDetails.setParameters(getReconventionParameters(reconvention));
@@ -183,12 +179,12 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 	 * @param reconvention the reconvention
 	 * @return the Parameters Object with reconvention data.
 	 */
-	Parameters getReconventionParameters(final Reconvention reconvention) {
-		Parameters parameters = new Parameters();
-		List<Parameter> listParameters = parameters.getParameter();
-		List<ReconventionParameter<?>> reconventionParameters = reconvention.getReconventionParameters();
-		for (ReconventionParameter<?> reconventionParameter : reconventionParameters) {
-			Parameter parameter = new Parameter();
+	com.calypso.tk.upload.jaxb.Parameters getReconventionParameters(final com.calypso.tk.product.reconvention.Reconvention reconvention) {
+		com.calypso.tk.upload.jaxb.Parameters parameters = new com.calypso.tk.upload.jaxb.Parameters();
+		List<com.calypso.tk.upload.jaxb.Parameter> listParameters = parameters.getParameter();
+		List<com.calypso.tk.product.reconvention.ReconventionParameter<?>> reconventionParameters = reconvention.getReconventionParameters();
+		for (com.calypso.tk.product.reconvention.ReconventionParameter<?> reconventionParameter : reconventionParameters) {
+			com.calypso.tk.upload.jaxb.Parameter parameter = new com.calypso.tk.upload.jaxb.Parameter();
 			parameter.setParameterName(reconventionParameter.getName());
 			parameter.setParameterValue(String.valueOf(reconventionParameter.getValue()));
 			listParameters.add(parameter);
@@ -244,7 +240,7 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 	 * @param book the book
 	 * @return the String with Book name.
 	 */
-	String getBook(final Book book) {
+	String getBook(final com.calypso.tk.core.Book book) {
 		if (book != null) {
 			return book.getName();
 		}
@@ -288,7 +284,7 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 	 * @param legalEntity the LegalEntity
 	 * @return the String with LegalEntity code
 	 */
-	String getCounterParty(final LegalEntity legalEntity) {
+	String getCounterParty(final com.calypso.tk.core.LegalEntity legalEntity) {
 		if (legalEntity != null) {
 			return legalEntity.getCode();
 		}
@@ -377,7 +373,7 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 	 * @return the time in millis
 	 */
 	int twentyFourHourTimeToMilliseconds(final int time) {
-		return (((time / 100) * 60) + (time % 100)) * 60000;
+		return (((time / HUNDRED) * SIXTY) + (time % HUNDRED)) * SIXTY_THOUSAND;
 	}
 
 }

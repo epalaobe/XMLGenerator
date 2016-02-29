@@ -9,7 +9,7 @@ import com.calypso.tk.core.Trade;
 public class CDUFTradeBuilderFactory {
 
 	/** The instance. */
-	private static CDUFTradeBuilderFactory INSTANCE = new CDUFTradeBuilderFactory();
+	private static CDUFTradeBuilderFactory instance = new CDUFTradeBuilderFactory();
 	
 	/**
 	 * Gets the single instance of CDUFTradeBuilderFactory.
@@ -17,7 +17,7 @@ public class CDUFTradeBuilderFactory {
 	 * @return single instance of CDUFTradeBuilderFactory
 	 */
 	public static CDUFTradeBuilderFactory getInstance() {
-		return INSTANCE;
+		return instance;
 	}
 	
     /**

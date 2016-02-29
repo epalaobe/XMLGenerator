@@ -1,5 +1,6 @@
 package calypsox.tk.bo.xml;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -69,8 +70,9 @@ public class CDUFFraBuilderTest {
 		assertNotNull(jaxbFra.getDiscountMethod());
 		assertNotNull(jaxbFra.getRate());
 		assertTrue(jaxbFra.isSettleInArrears());
-		assertTrue(jaxbFra.getDiscountMethod().equals("Method"));
-		assertTrue(jaxbFra.getRate()==1.0);
+		assertEquals(jaxbFra.getDiscountMethod(), "Method");
+		assertEquals(jaxbFra.getRate(), (Double) 1.0);
+		
 	}
 
 }

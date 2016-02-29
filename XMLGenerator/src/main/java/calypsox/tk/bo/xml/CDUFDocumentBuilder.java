@@ -47,16 +47,10 @@ public class CDUFDocumentBuilder {
 		doc.setCustomDataList(customDataList);
 
 		customDataList.getCustomData().add(createCustomData("CalypsoMessageId", Integer.toString(msg.getId())));
-		if (msg.getAction() != null) {
-			customDataList.getCustomData().add(createCustomData("MessageAction", msg.getAction().toString()));
-		}
-		if (msg.getSubAction() != null) {
-			customDataList.getCustomData().add(createCustomData("MessageSubAction", msg.getSubAction().toString()));
-		}
+		customDataList.getCustomData().add(createCustomData("MessageAction", getMsgAction(msg.getAction())));
+		customDataList.getCustomData().add(createCustomData("MessageSubAction", getMsgAction(msg.getSubAction())));
 		customDataList.getCustomData().add(createCustomData("ProcessingOrganization", getProccesingOrg(trade.getBook())));
-		if (trade.getStatus() != null) {
-			customDataList.getCustomData().add(createCustomData("TradeStatus", trade.getStatus().toString()));
-		}
+		customDataList.getCustomData().add(createCustomData("TradeStatus", getStatus(trade.getStatus())));
 		customDataList.getCustomData().add(createCustomData("TradeEnteredUser", trade.getEnteredUser()));
 	}
 
@@ -66,12 +60,26 @@ public class CDUFDocumentBuilder {
 		data.setValue(value);
 		return data;
 	}
-	
+
 	private String getProccesingOrg(final Book book){
 		if(book!=null){
 			if(book.getLegalEntity()!=null){
 				return book.getLegalEntity().getCode();
 			}
+		}
+		return "";
+	}
+
+	private String getMsgAction(final com.calypso.tk.core.Action action) {
+		if (action != null) {
+			return action.toString();
+		}
+		return "";
+	}
+
+	private String getStatus(final com.calypso.tk.core.Status status){
+		if(status!=null){
+			return status.toString();
 		}
 		return "";
 	}

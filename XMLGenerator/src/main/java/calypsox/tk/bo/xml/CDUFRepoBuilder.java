@@ -1,17 +1,15 @@
 package calypsox.tk.bo.xml;
 
 import java.util.List;
+import java.util.Vector;
 
-import com.calypso.tk.core.CashFlowSet;
-import com.calypso.tk.core.FlowGenerationException;
-import com.calypso.tk.core.JDate;
 import com.calypso.tk.core.Trade;
 import com.calypso.tk.marketdata.PricingEnv;
+import com.calypso.tk.product.Collateral;
 import com.calypso.tk.secfinance.SecFinanceTkUtil;
 import com.calypso.tk.upload.jaxb.BondDetail;
 import com.calypso.tk.upload.jaxb.BondDetails;
 import com.calypso.tk.upload.jaxb.CalypsoTrade;
-import com.calypso.tk.upload.jaxb.EquityDetail;
 import com.calypso.tk.upload.jaxb.EquityDetails;
 import com.calypso.tk.upload.jaxb.RepoDetails;
 import com.calypso.tk.upload.jaxb.RepoFunding;
@@ -32,7 +30,7 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 		com.calypso.tk.upload.jaxb.Repo jaxbRepo = new com.calypso.tk.upload.jaxb.Repo();
 		jaxbProduct.setRepo(jaxbRepo);
 
-		jaxbRepo.setRepoType(com.calypso.tk.product.Repo.getRepoType(repo)); //required
+		jaxbRepo.setRepoType(com.calypso.tk.product.Repo.getRepoType(repo)); //required Continuous
 		jaxbRepo.setAllocationType(repo.getAllocationType()); //required
 		jaxbRepo.setCallableBy(getCallableBy(repo.getCallableBy())); //required
 		jaxbRepo.setDirection(repo.getDirection()); //required
@@ -41,7 +39,7 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 		jaxbRepo.setNoticeDays(repo.getNoticeDays()); //required
 		jaxbRepo.setRepoDetails(getRepoDetails(repo)); //required
 		jaxbRepo.setSubstitutionDetails(getSubstitutionDetails(repo)); //required
-		// TODO: jaxbRepo.setOpenTerm(repo.getCash().getsec); //required
+		jaxbRepo.setOpenTerm(getOpenTerm(repo.getOpenTermB(), repo.isContinuous())); //required
 		jaxbRepo.setSecurityDetails(getSecurityDetails(repo)); //required 
 		jaxbRepo.setShowCleanPriceInDecimalB(SecFinanceTkUtil.getShowCleanPriceInDecimalUserProperty(repo.getProductFamily()));
 
@@ -52,7 +50,7 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 	 */
 	@Override
 	public void fillTradeHeader(final PricingEnv pricingEnv, final Trade trade, final CalypsoTrade calypsoTrade) {
-        super.fillTradeHeader(pricingEnv, trade, calypsoTrade);
+		super.fillTradeHeader(pricingEnv, trade, calypsoTrade);
 		com.calypso.tk.product.Repo repo = (com.calypso.tk.product.Repo) trade.getProduct();
 		calypsoTrade.setCashFlows(getCashflows(pricingEnv, repo));
 		calypsoTrade.setTradeNotional(repo.getPrincipal());
@@ -68,7 +66,6 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 
 		if(cash!=null){
 			repoFunding.setCurrency(cash.getCurrency()); //required
-			repoFunding.setDayCountConvention(getDayCount(repo.getDayCount())); //required
 			repoFunding.setRateIndex(getRateIndex(cash.getRateIndex())); //required
 			repoFunding.setRateIndexSource(getRateIndexSource(cash.getRateIndex())); //required
 			repoFunding.setTenor(getTenor(cash.getRateIndex())); //required
@@ -77,6 +74,8 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 			repoFunding.setFundingType(cash.getRateType()); //required
 			repoFunding.setFundingRate(cash.getFixedRate());
 			repoFunding.setIndexFactor(cash.getIndexFactor());
+
+			repoFunding.setDayCountConvention(getDayCount(repo.getDayCount())); //required
 
 			if(repo.isJGB()){
 				com.calypso.tk.product.JGBRepo jgbRepo = (com.calypso.tk.product.JGBRepo)repo;
@@ -114,9 +113,8 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 
 	private SecurityDetails getSecurityDetails(final com.calypso.tk.product.Repo repo){
 		SecurityDetails securityDetails = new SecurityDetails();
-
-		// TODO: securityDetails.setFXPrimaryCurrency(repo.get);
-		// TODO: securityDetails.setMarginFlagB(value);
+		securityDetails.setFXPrimaryCurrency(repo.getSecurity().getPrimaryCurrency());
+		// TODO: securityDetails.setMarginFlagB(repo.getHaircut()); 
 		securityDetails.setBondDetails(getBondDetails(repo));
 		securityDetails.setEquityDetails(getEquityDetails(repo));
 
@@ -126,17 +124,47 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 	private BondDetails getBondDetails(final com.calypso.tk.product.Repo repo){
 		BondDetails bondDetails = new BondDetails();
 		List<BondDetail> listBondDetails = bondDetails.getBondDetail();
-		// TODO: fill list
+		
+		Vector<Collateral> collaterals = repo.getCollaterals();
+		for(Collateral collateral : collaterals){
+
+			BondDetail bondDetail = new BondDetail();
+			bondDetail.setCleanPrice(collateral.getNegociatedPrice());
+			bondDetail.setDirtyPrice(collateral.getDirtyPrice());
+			bondDetail.setFxRate(collateral.getInitialFXRate());
+			bondDetail.setNominal(collateral.getNominal());
+			bondDetail.setQuantity(collateral.getQuantity());
+			bondDetail.setValue(collateral.getValue());
+			// TODO: bondDetail.setYield(collateral.get);
+			// TODO: bondDetail.setHaircutDetails(collateral.getHaircut());
+			// TODO: bondDetail.setProductCodeType();
+			// TODO: bondDetail.setProductCodeValue(value);
+			// TODO: bondDetail.setRemoveB();
+			// TODO: bondDetail.setUseQuantityB(value);
+			// TODO: bondDetail.setAdjustedPrice(collateral.getP);
+			listBondDetails.add(bondDetail);
+			
+		}
+
 
 		return bondDetails;
 	}
 
 	private EquityDetails getEquityDetails(final com.calypso.tk.product.Repo repo){
 		EquityDetails equityDetails = new EquityDetails();
-		List<EquityDetail> listEquityDetails = equityDetails.getEquityDetail();
-		// TODO:  fill list
+		// TODO: List<EquityDetail> listEquityDetails = equityDetails.getEquityDetail();
 
 		return equityDetails;
+	}
+	
+	private String getOpenTerm(boolean isOpen, boolean isContinuous){
+		if(isOpen){
+			return "OPEN";
+		}else if(isContinuous){
+			return "CONTINUOUS";
+		}else{
+			return "TERM";
+		}
 	}
 
 }
