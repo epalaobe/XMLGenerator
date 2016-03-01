@@ -34,7 +34,7 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 		jaxbRepo.setAllocationType(repo.getAllocationType()); //required
 		jaxbRepo.setCallableBy(getCallableBy(repo.getCallableBy())); //required
 		jaxbRepo.setDirection(repo.getDirection()); //required
-		jaxbRepo.setFillType(repo.getFillType()); //required
+		jaxbRepo.setFillType(repo.getFillType()); //required 
 		jaxbRepo.setFundingDetails(getRepoFunding(repo)); //required
 		jaxbRepo.setNoticeDays(repo.getNoticeDays()); //required
 		jaxbRepo.setRepoDetails(getRepoDetails(repo)); //required
@@ -116,7 +116,7 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 		securityDetails.setFXPrimaryCurrency(repo.getSecurity().getPrimaryCurrency());
 		// TODO: securityDetails.setMarginFlagB(repo.getHaircut()); 
 		securityDetails.setBondDetails(getBondDetails(repo));
-		securityDetails.setEquityDetails(getEquityDetails(repo));
+		// TODO: securityDetails.setEquityDetails(getEquityDetails(repo));
 
 		return securityDetails;
 	}
@@ -149,15 +149,8 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 
 		return bondDetails;
 	}
-
-	private EquityDetails getEquityDetails(final com.calypso.tk.product.Repo repo){
-		EquityDetails equityDetails = new EquityDetails();
-		// TODO: List<EquityDetail> listEquityDetails = equityDetails.getEquityDetail();
-
-		return equityDetails;
-	}
 	
-	private String getOpenTerm(boolean isOpen, boolean isContinuous){
+	private String getOpenTerm(final boolean isOpen, final boolean isContinuous){
 		if(isOpen){
 			return "OPEN";
 		}else if(isContinuous){

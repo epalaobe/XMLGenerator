@@ -6,7 +6,7 @@ import com.calypso.tk.core.Trade;
 /**
  * A factory for creating CDUFTradeBuilder objects.
  */
-public class CDUFTradeBuilderFactory {
+public final class CDUFTradeBuilderFactory {
 
 	/** The instance. */
 	private static CDUFTradeBuilderFactory instance = new CDUFTradeBuilderFactory();

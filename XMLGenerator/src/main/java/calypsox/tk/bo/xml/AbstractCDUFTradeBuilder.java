@@ -28,8 +28,17 @@ import com.calypso.tk.upload.jaxb.TradeKeywords;
 
 public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 
+    /**
+     * Variable for twentyFourHourTimeToMilliseconds method
+     */
     private static final int HUNDRED = 100;
+    /**
+     * Variable for twentyFourHourTimeToMilliseconds method
+     */
     private static final int SIXTY = 60;
+    /**
+     * Variable for twentyFourHourTimeToMilliseconds method
+     */
     private static final int SIXTY_THOUSAND = 60000;
 	
 	/**
