@@ -11,6 +11,8 @@ import org.junit.Test;
 import com.calypso.tk.core.Trade;
 import com.calypso.tk.product.Bond;
 import com.calypso.tk.product.FRA;
+import com.calypso.tk.product.Repo;
+import com.calypso.tk.product.SimpleTransfer;
 import com.calypso.tk.product.Swap;
 
 /**
@@ -53,6 +55,32 @@ public class CDUFTradeBuilderFactoryTest {
         trade.setProduct(new Bond());
 
         CDUFTradeBuilderFactory.getInstance().getBuilder(trade);
+    }
+    
+    /**
+     * Test method for {@link calypsox.tk.bo.xml.CDUFTradeBuilderFactory#getBuilder(com.calypso.tk.core.Trade)}.
+     */
+    @Test
+    public void testGetBuilderSimpleTransfer() {
+        Trade trade = new Trade();
+        trade.setProduct(new SimpleTransfer());
+
+        CDUFTradeBuilder builder = CDUFTradeBuilderFactory.getInstance().getBuilder(trade);
+        assertNotNull(builder);
+        assertTrue(builder instanceof CDUFSimpleTransferBuilder);
+    }
+    
+    /**
+     * Test method for {@link calypsox.tk.bo.xml.CDUFTradeBuilderFactory#getBuilder(com.calypso.tk.core.Trade)}.
+     */
+    @Test
+    public void testGetBuilderRepo() {
+        Trade trade = new Trade();
+        trade.setProduct(new Repo());
+
+        CDUFTradeBuilder builder = CDUFTradeBuilderFactory.getInstance().getBuilder(trade);
+        assertNotNull(builder);
+        assertTrue(builder instanceof CDUFRepoBuilder);
     }
 
 }

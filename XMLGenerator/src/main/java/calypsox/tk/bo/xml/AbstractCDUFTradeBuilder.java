@@ -28,9 +28,9 @@ import com.calypso.tk.upload.jaxb.TradeKeywords;
 
 public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 
-    private static final int HUNDRED = 7;
-    private static final int SIXTY = 7;
-    private static final int SIXTY_THOUSAND = 7;
+    private static final int HUNDRED = 100;
+    private static final int SIXTY = 60;
+    private static final int SIXTY_THOUSAND = 60000;
 	
 	/**
 	 * Fill some data header that are general to all trades.
@@ -324,7 +324,8 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 			HolidayCode holidayCode = new HolidayCode();
 			List<String> list = holidayCode.getHoliday();
 			if (!holidays.isEmpty()) {
-				for (String holiday : holidays) {
+				for (int i=0; i<holidays.size(); i++) {
+					String holiday = holidays.get(i);
 					list.add(holiday);
 				}
 				return holidayCode;

@@ -135,13 +135,13 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 			bondDetail.setNominal(collateral.getNominal());
 			bondDetail.setQuantity(collateral.getQuantity());
 			bondDetail.setValue(collateral.getValue());
-			// TODO: bondDetail.setYield(collateral.get);
+			// TODO: bondDetail.setYield();
 			// TODO: bondDetail.setHaircutDetails(collateral.getHaircut());
 			// TODO: bondDetail.setProductCodeType();
-			// TODO: bondDetail.setProductCodeValue(value);
+			// TODO: bondDetail.setProductCodeValue();
 			// TODO: bondDetail.setRemoveB();
-			// TODO: bondDetail.setUseQuantityB(value);
-			// TODO: bondDetail.setAdjustedPrice(collateral.getP);
+			// TODO: bondDetail.setUseQuantityB();
+			// TODO: bondDetail.setAdjustedPrice();
 			listBondDetails.add(bondDetail);
 			
 		}

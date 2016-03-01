@@ -21,7 +21,7 @@ public abstract class AbstractCDUFProductBuilder extends AbstractCDUFTradeBuilde
 
 	protected String getTenor(final RateIndex rateIndex) {
 		if (rateIndex != null) {
-			Tenor tenor = rateIndex.getTenor();
+			Tenor tenor = rateIndex.getTenor(); 
 			if (tenor != null) {
 				return tenor.toString();
 			}
