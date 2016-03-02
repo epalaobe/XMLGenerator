@@ -10,7 +10,6 @@ import com.calypso.tk.secfinance.SecFinanceTkUtil;
 import com.calypso.tk.upload.jaxb.BondDetail;
 import com.calypso.tk.upload.jaxb.BondDetails;
 import com.calypso.tk.upload.jaxb.CalypsoTrade;
-import com.calypso.tk.upload.jaxb.EquityDetails;
 import com.calypso.tk.upload.jaxb.RepoDetails;
 import com.calypso.tk.upload.jaxb.RepoFunding;
 import com.calypso.tk.upload.jaxb.SecurityDetails;

@@ -16,6 +16,8 @@ import com.calypso.tk.product.SimpleTransfer;
 import com.calypso.tk.product.Swap;
 
 /**
+ * Test Class for CDUFTradeBuilderFactory
+ * 
  * @author xe36404
  */
 public class CDUFTradeBuilderFactoryTest {

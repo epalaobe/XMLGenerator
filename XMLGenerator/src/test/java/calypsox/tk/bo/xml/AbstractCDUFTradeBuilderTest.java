@@ -1,5 +1,6 @@
 package calypsox.tk.bo.xml;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -9,6 +10,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Vector;
+
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,8 +28,7 @@ import com.calypso.tk.core.TradeBundle;
 import com.calypso.tk.refdata.RateIndex;
 
 /**
- * @author epalaobe
- *
+ * Test Class for AbstractCDUFTradeBuilder.
  */
 public class AbstractCDUFTradeBuilderTest {
 
@@ -53,12 +55,15 @@ public class AbstractCDUFTradeBuilderTest {
 	 */
 	@Test
 	public final void testGetCounterPartyCountry() {
-		LegalEntity mockedLegalEntity = mock(LegalEntity.class);
-		mockedLegalEntity.setCountry("SPAIN");
+		LegalEntity legalEntity = new LegalEntity();
+		legalEntity.setCountry("SPAIN");
 
-		doCallRealMethod().when(this.builder).getCounterPartyCountry(mockedLegalEntity);
-		assertNotNull(this.builder.getCounterPartyCountry(mockedLegalEntity));
-		assertTrue(this.builder.getCounterPartyCountry(mockedLegalEntity).equals("SPAIN"));
+		doCallRealMethod().when(this.builder).getCounterPartyCountry(legalEntity);
+		
+		String country = this.builder.getCounterPartyCountry(legalEntity);
+		
+		assertNotNull(country);
+		assertTrue(country.equals("SPAIN"));
 	}
 
 	/**
@@ -66,12 +71,15 @@ public class AbstractCDUFTradeBuilderTest {
 	 */
 	@Test
 	public final void testGetAction() {
-		Trade mockedTrade = mock(Trade.class);
-		mockedTrade.setAction(Action.AMEND);
+		Trade trade = new Trade();
+		trade.setAction(Action.AMEND);
 
-		doCallRealMethod().when(this.builder).getAction(mockedTrade.getAction());
-		assertNotNull(this.builder.getAction(mockedTrade.getAction()));
-		assertTrue(this.builder.getAction(mockedTrade.getAction()).equals("AMEND"));
+		doCallRealMethod().when(this.builder).getAction(trade.getAction());
+		
+		String action = this.builder.getAction(trade.getAction());
+		
+		assertNotNull(action);
+		assertTrue(action.equals("AMEND"));
 	}
 
 	/**
@@ -79,14 +87,17 @@ public class AbstractCDUFTradeBuilderTest {
 	 */
 	@Test
 	public final void testGetTradeDateJDate() {
-		Trade mockedTrade = mock(Trade.class);
+		Trade trade = new Trade();
 		JDate jDate = JDate.getNow();
 		JDatetime jDateTime = new JDatetime(jDate.getDate().getTime());
-		mockedTrade.setTradeDate(jDateTime);
+		trade.setTradeDate(jDateTime);
 
-		doCallRealMethod().when(this.builder).getTradeDateJDate(mockedTrade.getTradeDate());
-		assertNotNull(this.builder.getTradeDateJDate(mockedTrade.getTradeDate()));
-		assertTrue(this.builder.getTradeDateJDate(mockedTrade.getTradeDate()).equals(jDate));
+		doCallRealMethod().when(this.builder).getTradeDateJDate(trade.getTradeDate());
+		
+		JDate jDateTradeDate = this.builder.getTradeDateJDate(trade.getTradeDate());
+		
+		assertNotNull(jDateTradeDate);
+		assertTrue(jDateTradeDate.equals(jDate));
 	}
 
 	/**
@@ -125,19 +136,32 @@ public class AbstractCDUFTradeBuilderTest {
 	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getBuySell(double)}.
 	 */
 	@Test
-	public final void testGetBuySell() {
-		Trade mockedTrade = mock(Trade.class);
-		mockedTrade.setQuantity(-1000.0);
+	public final void testGetBuySell_SELL() {
+		Trade trade = new Trade();
+		trade.setQuantity(-1000.0);
 
-		doCallRealMethod().when(this.builder).getBuySell(mockedTrade.getQuantity());
-		assertNotNull(this.builder.getBuySell(mockedTrade.getQuantity()));
-		assertTrue(this.builder.getBuySell(mockedTrade.getQuantity()).equals("SELL"));
+		doCallRealMethod().when(this.builder).getBuySell(trade.getQuantity());
+		
+		String buyOrSell = this.builder.getBuySell(trade.getQuantity());
+		
+		assertNotNull(buyOrSell);
+		assertTrue(buyOrSell.equals("SELL"));
+	}
+	
+	/**
+	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getBuySell(double)}.
+	 */
+	@Test
+	public final void testGetBuySell_BUY() {
+		Trade trade = new Trade();
+		trade.setQuantity(1000.0);
 
-		mockedTrade.setQuantity(1000.0);
-
-		doCallRealMethod().when(this.builder).getBuySell(mockedTrade.getQuantity());
-		assertNotNull(this.builder.getBuySell(mockedTrade.getQuantity()));
-		assertTrue(this.builder.getBuySell(mockedTrade.getQuantity()).equals("BUY"));
+		doCallRealMethod().when(this.builder).getBuySell(trade.getQuantity());
+		
+		String buyOrSell = this.builder.getBuySell(trade.getQuantity());
+		
+		assertNotNull(buyOrSell);
+		assertTrue(buyOrSell.equals("BUY"));
 	}
 
 	/**
@@ -145,13 +169,15 @@ public class AbstractCDUFTradeBuilderTest {
 	 */
 	@Test
 	public final void testGetBook() {
-		Book mockedBook = mock(Book.class);
-		doCallRealMethod().when(mockedBook).setName("TestName");
-		mockedBook.setName("TestName");
-		doCallRealMethod().when(this.builder).getBook(mockedBook);
-		doCallRealMethod().when(mockedBook).getName();
-		assertNotNull(this.builder.getBook(mockedBook));
-		assertTrue(this.builder.getBook(mockedBook).equals("TestName"));
+		Book book = new Book();
+		book.setName("TestName");
+		
+		doCallRealMethod().when(this.builder).getBook(book);
+		
+		String bookName = this.builder.getBook(book);
+		
+		assertNotNull(bookName);
+		assertTrue(bookName.equals("TestName"));
 	}
 
 	/**
@@ -159,12 +185,15 @@ public class AbstractCDUFTradeBuilderTest {
 	 */
 	@Test
 	public final void testGetTradeBundle() {
-		TradeBundle mockedTradeBundle = mock(TradeBundle.class);
-		mockedTradeBundle.setName("TestName");
+		TradeBundle tradeBundle =  new TradeBundle();
+		tradeBundle.setName("TestName");
 
-		doCallRealMethod().when(this.builder).getTradeBundle(mockedTradeBundle);
-		assertNotNull(this.builder.getTradeBundle(mockedTradeBundle));
-		assertTrue(this.builder.getTradeBundle(mockedTradeBundle).equals("TestName"));
+		doCallRealMethod().when(this.builder).getTradeBundle(tradeBundle);
+		
+		String tradeBundleName = this.builder.getTradeBundle(tradeBundle);
+		
+		assertNotNull(tradeBundleName);
+		assertTrue(tradeBundleName.equals("TestName"));
 	}
 
 	/**
@@ -172,12 +201,16 @@ public class AbstractCDUFTradeBuilderTest {
 	 */
 	@Test
 	public final void testGetTradeBundleType() {
-		TradeBundle mockedTradeBundle = mock(TradeBundle.class);
-		mockedTradeBundle.setType("TestType");
+		TradeBundle tradeBundle = new TradeBundle();
+		tradeBundle.setName("TestName");
+		tradeBundle.setType("TestType");
 
-		doCallRealMethod().when(this.builder).getTradeBundleType(mockedTradeBundle);
-		assertNotNull(this.builder.getTradeBundleType(mockedTradeBundle));
-		assertTrue(this.builder.getTradeBundleType(mockedTradeBundle).equals("TestType"));
+		doCallRealMethod().when(this.builder).getTradeBundleType(tradeBundle);
+		
+		String tradeBundleTypeName = this.builder.getTradeBundleType(tradeBundle);
+		
+		assertNotNull(tradeBundleTypeName);
+		assertTrue(tradeBundleTypeName.equals("TestType"));
 	}
 
 	/**
@@ -185,12 +218,16 @@ public class AbstractCDUFTradeBuilderTest {
 	 */
 	@Test
 	public final void testGetTradeBundleOneMessage() {
-		TradeBundle mockedTradeBundle = mock(TradeBundle.class);
-		mockedTradeBundle.setOneMessage(true);
+		TradeBundle tradeBundle =  new TradeBundle();
+		tradeBundle.setName("TestName");
+		tradeBundle.setOneMessage(true);
 
-		doCallRealMethod().when(this.builder).getTradeBundleOneMessage(mockedTradeBundle);
-		assertNotNull(this.builder.getTradeBundleOneMessage(mockedTradeBundle));
-		assertTrue(this.builder.getTradeBundleOneMessage(mockedTradeBundle));
+		doCallRealMethod().when(this.builder).getTradeBundleOneMessage(tradeBundle);
+		
+		boolean tradeBundle1Msg = this.builder.getTradeBundleOneMessage(tradeBundle);
+		
+		assertNotNull(tradeBundle1Msg);
+		assertTrue(tradeBundle1Msg);
 	}
 
 	/**
@@ -198,12 +235,15 @@ public class AbstractCDUFTradeBuilderTest {
 	 */
 	@Test
 	public final void testGetCounterParty() {
-		LegalEntity mockedLegalEntity = mock(LegalEntity.class);
-		mockedLegalEntity.setCode("TestName");
+		LegalEntity legalEntity = new LegalEntity();
+		legalEntity.setCode("TestName");
 
-		doCallRealMethod().when(this.builder).getCounterParty(mockedLegalEntity);
-		assertNotNull(this.builder.getCounterParty(mockedLegalEntity));
-		assertTrue(this.builder.getCounterParty(mockedLegalEntity).equals("TestName"));
+		doCallRealMethod().when(this.builder).getCounterParty(legalEntity);
+		
+		String counterPartyName = this.builder.getCounterParty(legalEntity);
+		
+		assertNotNull(counterPartyName);
+		assertTrue(counterPartyName.equals("TestName"));
 	}
 
 	/**
@@ -212,9 +252,13 @@ public class AbstractCDUFTradeBuilderTest {
 	@Test
 	public final void testGetRoundingMethod() {
 		RoundingMethod roundingMethod = new RoundingMethod();
+		
 		doCallRealMethod().when(this.builder).getRoundingMethod(roundingMethod);
-		assertNotNull(this.builder.getRoundingMethod(roundingMethod));
-		assertTrue(this.builder.getRoundingMethod(roundingMethod).equals("NEAREST"));
+		
+		String roundingMethodName = this.builder.getRoundingMethod(roundingMethod);
+		
+		assertNotNull(roundingMethodName);
+		assertTrue(roundingMethodName.equals("NEAREST"));
 	}
 
 	/**
@@ -230,20 +274,26 @@ public class AbstractCDUFTradeBuilderTest {
 	 */
 	@Test
 	public final void testGetHolidayCode() {
-		Trade mockedTrade = mock(Trade.class);
+		Trade trade = mock(Trade.class);
 		Product mockedProduct = mock(Product.class);
-		when(mockedTrade.getProduct()).thenReturn(mockedProduct);
+		when(trade.getProduct()).thenReturn(mockedProduct);
 		RateIndex mockedRateIndex = mock(RateIndex.class);
 		when(mockedProduct.getRateIndex()).thenReturn(mockedRateIndex);
-		
+
 		@SuppressWarnings("unchecked")
 		Vector<String> mockedVector = mock(Vector.class);
 		when(mockedProduct.getHolidays()).thenReturn(mockedVector);
+		when(mockedVector.size()).thenReturn(1);
 		doReturn("TestHoliday").when(mockedVector).get(0);
 
 		doCallRealMethod().when(this.builder).getHolidayCode(mockedProduct);
-		assertNotNull(this.builder.getHolidayCode(mockedProduct));
-		//TODO
+		
+		com.calypso.tk.upload.jaxb.HolidayCode holidayCode = this.builder.getHolidayCode(mockedProduct);
+		
+		assertNotNull(holidayCode);
+		assertNotNull(holidayCode.getHoliday());
+		assertNotNull(holidayCode.getHoliday().get(0));
+		assertEquals("TestHoliday", holidayCode.getHoliday().get(0));
 	}
 
 	/**
@@ -251,7 +301,15 @@ public class AbstractCDUFTradeBuilderTest {
 	 */
 	@Test
 	public final void testGetXmlGregorianCalendarFromDate() {
-		fail("Not yet implemented"); // TODO
+		JDate date=JDate.getNow();
+
+		doCallRealMethod().when(this.builder).getXmlGregorianCalendarFromDate(date);
+		
+		XMLGregorianCalendar xmlGregorian = this.builder.getXmlGregorianCalendarFromDate(date);
+		
+		assertNotNull(xmlGregorian);
+		assertNotNull(xmlGregorian.getDay());
+		assertEquals(date.getDayOfMonth(), xmlGregorian.getDay());
 	}
 
 	/**
@@ -268,10 +326,12 @@ public class AbstractCDUFTradeBuilderTest {
 	@Test
 	public final void testTwentyFourHourTimeToMilliseconds() {
 		int hour = 100;
-		int inMilliseconds = 3600000;
+		
 		doCallRealMethod().when(this.builder).twentyFourHourTimeToMilliseconds(hour);
-		assertNotNull(this.builder.twentyFourHourTimeToMilliseconds(hour));
-		assertTrue(this.builder.twentyFourHourTimeToMilliseconds(hour)==inMilliseconds);
+		
+		int inMilliseconds = this.builder.twentyFourHourTimeToMilliseconds(hour);
+		
+		assertEquals(3600000, inMilliseconds);
 	}
 
 }

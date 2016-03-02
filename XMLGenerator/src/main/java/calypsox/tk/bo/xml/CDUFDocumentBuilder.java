@@ -63,7 +63,7 @@ public class CDUFDocumentBuilder {
 
 	private String getProccesingOrg(final Book book){
 		if(book!=null && book.getLegalEntity()!=null){
-				return book.getLegalEntity().getCode();
+			return book.getLegalEntity().getCode();
 		}
 		return "";
 	}
