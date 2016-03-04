@@ -2,22 +2,35 @@ package calypsox.tk.bo.xml;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
 import java.util.Vector;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.calypso.tk.core.CalypsoServiceException;
+import com.calypso.tk.core.DateRoll;
+import com.calypso.tk.core.DateRule;
+import com.calypso.tk.core.DayCount;
+import com.calypso.tk.core.DisplayValue;
+import com.calypso.tk.core.Frequency;
+import com.calypso.tk.core.LegalEntity;
 import com.calypso.tk.core.Tenor;
+import com.calypso.tk.product.util.CompoundMethod;
 import com.calypso.tk.refdata.RateIndex;
+import com.calypso.tk.refdata.RateIndexDefaults;
+import com.calypso.tk.refdata.SecFinanceCallableBy;
+import com.calypso.tk.service.DSConnection;
+import com.calypso.tk.service.RemoteReferenceData;
+import com.calypso.tk.upload.jaxb.HolidayCodeType;
 
 /**
  * Test Class for AbstractCDUFProductBuilder.
  */
 public class AbstractCDUFProductBuilderTest {
-	
+
 	AbstractCDUFProductBuilder builder;
 
 	/**
@@ -35,11 +48,11 @@ public class AbstractCDUFProductBuilderTest {
 	public void testGetTenor() {
 		RateIndex rateIndex = new RateIndex();
 		rateIndex.setTenor(new Tenor(Tenor.INTRADAY_LABEL));
-		
+
 		doCallRealMethod().when(this.builder).getTenor(rateIndex);
-		
+
 		String tenorName = this.builder.getTenor(rateIndex);
-		
+
 		assertNotNull(tenorName);
 		assertTrue(tenorName.equals(Tenor.INTRADAY_LABEL));
 	}
@@ -51,11 +64,11 @@ public class AbstractCDUFProductBuilderTest {
 	public void testGetRateIndex() {
 		RateIndex rateIndex = new RateIndex();
 		rateIndex.setName("RateIndexName");
-		
+
 		doCallRealMethod().when(this.builder).getRateIndex(rateIndex);
-		
+
 		String rateIndexName = this.builder.getRateIndex(rateIndex);
-		
+
 		assertNotNull(rateIndexName);
 		assertTrue(rateIndexName.equals("RateIndexName"));
 	}
@@ -66,13 +79,13 @@ public class AbstractCDUFProductBuilderTest {
 	@Test
 	public void testGetRateIndexHolidays() {
 		RateIndex rateIndex = new RateIndex();
-		
+
 		Vector<String> vacioVector = new Vector<String>();
-		
+
 		doCallRealMethod().when(this.builder).getRateIndexHolidays(rateIndex);
-		
+
 		Vector<String> holidays = this.builder.getRateIndexHolidays(rateIndex);
-		
+
 		assertNotNull(holidays);
 		assertTrue(holidays.equals(vacioVector));
 	}
@@ -84,11 +97,11 @@ public class AbstractCDUFProductBuilderTest {
 	public void testGetRateIndexSource() {
 		RateIndex rateIndex = new RateIndex();
 		rateIndex.setSource("RateIndexSource");
-		
+
 		doCallRealMethod().when(this.builder).getRateIndexSource(rateIndex);
-		
+
 		String sourceName = this.builder.getRateIndexSource(rateIndex);
-		
+
 		assertNotNull(sourceName);
 		assertTrue(sourceName.equals("RateIndexSource"));
 	}
@@ -98,7 +111,31 @@ public class AbstractCDUFProductBuilderTest {
 	 */
 	@Test
 	public void testGetResetLag() {
-		fail("Not yet implemented");		
+		RateIndex rateIndex = new RateIndex();
+		RateIndexDefaults rateIndexDefaults = new RateIndexDefaults();
+		rateIndexDefaults.setResetDays(2);
+		rateIndex.setDefaults(rateIndexDefaults);
+
+		doCallRealMethod().when(this.builder).getResetLag(1, true, rateIndex);
+		String resetLagValue = this.builder.getResetLag(1, true, rateIndex);
+
+		assertNotNull(resetLagValue);
+		assertTrue(resetLagValue.equals("2"));
+
+	}
+
+	/**
+	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFProductBuilder#getResetLag(int, boolean, com.calypso.tk.refdata.RateIndex)}.
+	 */
+	@Test
+	public void testGetResetLagDefault() {
+		RateIndex rateIndex = new RateIndex();
+
+		doCallRealMethod().when(this.builder).getResetLag(1, false, rateIndex);
+		String resetLagValue = this.builder.getResetLag(1, false, rateIndex);
+
+		assertNotNull(resetLagValue);
+		assertTrue(resetLagValue.equals("1"));		
 	}
 
 	/**
@@ -106,7 +143,17 @@ public class AbstractCDUFProductBuilderTest {
 	 */
 	@Test
 	public void testGetRateIndexDayCount() {
-		fail("Not yet implemented");
+
+		RateIndex rateIndex = new RateIndex();
+		DayCount dayCount = DayCount.D_30_365;
+		rateIndex.setDayCount(dayCount);
+
+		doCallRealMethod().when(this.builder).getRateIndexDayCount(rateIndex);
+		String rateIndexName = this.builder.getRateIndexDayCount(rateIndex);
+
+		assertNotNull(rateIndexName);
+		assertTrue(rateIndexName.equals(DayCount.D_30_365.toString()));
+
 	}
 
 	/**
@@ -114,7 +161,19 @@ public class AbstractCDUFProductBuilderTest {
 	 */
 	@Test
 	public void testGetHolidayCodeTypeFromVector() {
-		fail("Not yet implemented");
+
+		HolidayCodeType holidayCodeType = new HolidayCodeType();
+		List<String> list = holidayCodeType.getHoliday();
+		Vector<String> vector = new Vector<String>();
+		vector.add("HolydayC1");
+		vector.add("HolydayC2");
+		list.add("HolydayC1");
+		list.add("HolydayC2");
+
+		doCallRealMethod().when(this.builder).getHolidayCodeTypeFromVector(vector);
+		HolidayCodeType HolydayList = this.builder.getHolidayCodeTypeFromVector(vector);
+		assertNotNull(HolydayList);
+		assertTrue(HolydayList.getHoliday().equals(list));
 	}
 
 	/**
@@ -122,7 +181,15 @@ public class AbstractCDUFProductBuilderTest {
 	 */
 	@Test
 	public void testGetCallableBy() {
-		fail("Not yet implemented");
+
+		SecFinanceCallableBy secFinanceCallebleBy = SecFinanceCallableBy.LENDER;
+
+		doCallRealMethod().when(this.builder).getCallableBy(secFinanceCallebleBy);
+
+		String label = secFinanceCallebleBy.getLabel();
+		assertNotNull(label);
+		assertTrue(label.equals(SecFinanceCallableBy.LENDER.getLabel()));
+
 	}
 
 	/**
@@ -130,15 +197,42 @@ public class AbstractCDUFProductBuilderTest {
 	 */
 	@Test
 	public void testGetDateRule() {
-		fail("Not yet implemented");
+
+		DateRule dateRule = new DateRule();
+		dateRule.setName("DateRuleName");
+
+		doCallRealMethod().when(this.builder).getDateRule(dateRule);
+
+		String dateRuleName = this.builder.getDateRule(dateRule);
+
+		assertNotNull(dateRuleName);
+		assertTrue(dateRuleName.equals("DateRuleName"));
+
 	}
 
 	/**
 	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFProductBuilder#getLegalEntity(int)}.
+	 * @throws CalypsoServiceException 
 	 */
 	@Test
-	public void testGetLegalEntity() {
-		fail("Not yet implemented");
+	public void testGetLegalEntity() throws CalypsoServiceException {
+		DSConnection mockedDS = mock(DSConnection.class);
+		RemoteReferenceData mockedRRD = mock(RemoteReferenceData.class);
+		LegalEntity LE = new LegalEntity();
+		LE.setId(1);
+		LE.setCode("LECode");
+
+		when(mockedDS.getRemoteReferenceData()).thenReturn(mockedRRD);
+		
+		when(mockedRRD.getLegalEntity(1)).thenReturn(LE); 
+		
+		DSConnection.setDefault(mockedDS);
+
+		doCallRealMethod().when(this.builder).getLegalEntity(1);
+		String LECodeName = this.builder.getLegalEntity(1);
+
+		assertNotNull(LECodeName);
+		assertTrue(LECodeName.equals("LECode"));
 	}
 
 	/**
@@ -146,7 +240,15 @@ public class AbstractCDUFProductBuilderTest {
 	 */
 	@Test
 	public void testParseStringToInteger() {
-		fail("Not yet implemented");
+
+		String str = "1";
+		doCallRealMethod().when(this.builder).parseStringToInteger(str);
+
+		int parseStringToIntegerInt = this.builder.parseStringToInteger(str);
+
+		assertNotNull(parseStringToIntegerInt);
+		assertTrue(parseStringToIntegerInt == 1);
+
 	}
 
 	/**
@@ -154,7 +256,15 @@ public class AbstractCDUFProductBuilderTest {
 	 */
 	@Test
 	public void testGetDateRoll() {
-		fail("Not yet implemented");
+
+		DateRoll dateRoll = DateRoll.R_END_MONTH;
+		doCallRealMethod().when(this.builder).getDateRoll(dateRoll);
+		String dateRollName = this.builder.getDateRoll(dateRoll);
+
+		assertNotNull(dateRollName);
+		assertTrue(dateRollName.equals(DateRoll.R_END_MONTH.toString()));
+
+
 	}
 
 	/**
@@ -162,7 +272,14 @@ public class AbstractCDUFProductBuilderTest {
 	 */
 	@Test
 	public void testGetCompoundMethod() {
-		fail("Not yet implemented");
+
+		CompoundMethod compoundMethod = CompoundMethod.FLAT;
+		doCallRealMethod().when(this.builder).getCompoundMethod(compoundMethod);
+		String compoundMethodName = this.builder.getCompoundMethod(compoundMethod);
+
+		assertNotNull(compoundMethodName);
+		assertTrue(compoundMethodName.equals("Flat"));
+
 	}
 
 	/**
@@ -170,7 +287,14 @@ public class AbstractCDUFProductBuilderTest {
 	 */
 	@Test
 	public void testGetFrequency() {
-		fail("Not yet implemented");
+
+		Frequency frequency = Frequency.F_DAILY;
+		doCallRealMethod().when(this.builder).getFrequency(frequency);
+		String frequencyName = this.builder.getFrequency(frequency);
+
+		assertNotNull(frequencyName);
+		assertTrue(frequencyName.equals(Frequency.F_DAILY.toString()));
+
 	}
 
 	/**
@@ -178,7 +302,14 @@ public class AbstractCDUFProductBuilderTest {
 	 */
 	@Test
 	public void testGetDayCount() {
-		fail("Not yet implemented");
+
+		DayCount dayCount = DayCount.D_30_365;
+		doCallRealMethod().when(this.builder).getDayCount(dayCount);
+		String dayCountName = this.builder.getDayCount(dayCount);
+
+		assertNotNull(dayCountName);
+		assertTrue(dayCountName.equals(DayCount.D_30_365.toString()));
+
 	}
 
 	/**
@@ -186,7 +317,18 @@ public class AbstractCDUFProductBuilderTest {
 	 */
 	@Test
 	public void testGetDisplayValue() {
-		fail("Not yet implemented");
+
+		DisplayValue mockedDisplayValue = mock(DisplayValue.class);
+		mockedDisplayValue.set(2.1);
+
+		when(mockedDisplayValue.get()).thenReturn(2.1);
+		doCallRealMethod().when(this.builder).getDisplayValue(mockedDisplayValue);
+
+		double dpd = this.builder.getDisplayValue(mockedDisplayValue);
+
+		assertNotNull(dpd);
+		assertTrue(dpd == 2.1);
+
 	}
 
 }
