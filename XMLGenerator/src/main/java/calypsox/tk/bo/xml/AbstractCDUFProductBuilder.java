@@ -19,11 +19,15 @@ import com.calypso.tk.upload.jaxb.HolidayCodeType;
  */
 public abstract class AbstractCDUFProductBuilder extends AbstractCDUFTradeBuilder {
 
+	/**
+	 * @param rateIndex the RateIndex
+	 * @return the String with RateIndex Tenor name.
+	 */
 	protected String getTenor(final RateIndex rateIndex) {
 		if (rateIndex != null) {
 			Tenor tenor = rateIndex.getTenor(); 
 			if (tenor != null) {
-				return tenor.toString();
+				return tenor.getName();
 			}
 		}
 		return null;
@@ -208,11 +212,26 @@ public abstract class AbstractCDUFProductBuilder extends AbstractCDUFTradeBuilde
 		return null;
 	}
 	
+	/**
+	 * @param displayValue the DisplayValue object
+	 * @return the double display value
+	 */
 	protected double getDisplayValue(final com.calypso.tk.core.DisplayValue displayValue) {
 		if (displayValue != null) {
 			return displayValue.get();
 		}
 		return 0.0D;
+	}
+	
+	/**
+	 * @param rateIndex the RateIndex
+	 * @return the String with RateIndex Tenor name.
+	 */
+	protected String getTenorName(final com.calypso.tk.core.Tenor tenor) {
+		if (tenor != null) {
+				return tenor.getName();
+		}
+		return null;
 	}
 
 }

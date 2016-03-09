@@ -21,10 +21,8 @@ import com.calypso.tk.core.Trade;
 import com.calypso.tk.core.TradeBundle;
 import com.calypso.tk.marketdata.PricingEnv;
 import com.calypso.tk.upload.jaxb.CalypsoTrade;
-import com.calypso.tk.upload.jaxb.CashFlows;
 import com.calypso.tk.upload.jaxb.HolidayCode;
 import com.calypso.tk.upload.jaxb.Keyword;
-import com.calypso.tk.upload.jaxb.TradeKeywords;
 
 public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 
@@ -140,8 +138,8 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 	 * @param trade the trade
 	 * @return the TradeKeywords object with all keywords values.
 	 */
-	TradeKeywords getTradeKeywords(final Trade trade) {
-		TradeKeywords keywords = new TradeKeywords();
+	com.calypso.tk.upload.jaxb.TradeKeywords getTradeKeywords(final Trade trade) {
+		com.calypso.tk.upload.jaxb.TradeKeywords keywords = new com.calypso.tk.upload.jaxb.TradeKeywords();
 		List<Keyword> kwList = keywords.getKeyword();
 
 		@SuppressWarnings("unchecked")
@@ -201,8 +199,15 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 		return parameters;
 	}
 
-	CashFlows getCashflows(final PricingEnv pricingEnv, final com.calypso.tk.core.Product product) {
-		CashFlows cashflows = new CashFlows();
+	/**
+	 * Get de cash flows of product
+	 * 
+	 * @param pricingEnv the pricing enviroment
+	 * @param product the product
+	 * @return the CashFlows of product
+	 */
+	com.calypso.tk.upload.jaxb.CashFlows getCashflows(final PricingEnv pricingEnv, final com.calypso.tk.core.Product product) {
+		com.calypso.tk.upload.jaxb.CashFlows cashflows = new com.calypso.tk.upload.jaxb.CashFlows();
 		List<com.calypso.tk.upload.jaxb.Cashflow> cfList = cashflows.getCashFlow();
 
 		CashFlowSet cfSet = null;
@@ -237,6 +242,12 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 		return cashflows;
 	}
 
+	/**
+	 * Get the direction of trade
+	 * 
+	 * @param quantity the quantity
+	 * @return buy if quantity is higher and sell if is smaller.
+	 */
 	String getBuySell(final double quantity) {
 		if (quantity > 0) {
 			return "BUY";

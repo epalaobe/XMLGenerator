@@ -83,7 +83,7 @@ public class CDUFTradeXMLGenerator implements XMLGenerator {
 		//DSConnection dsConnection = ConnectionUtil.connect(args, "MainEntry");
 		DSConnection dsConnection = ConnectionUtil.connect("admin", "calypso", "Conector", "CalypsoV14"); // EVERIS V14.0
 		BOMessage msg = new BOMessage();
-		int tradeId = 1687052;
+		int tradeId = 1693190;
 		// FRA
 		msg.setTradeId(tradeId); // 1680476 V14.0 Everis //669645 V14.4 BBVA
 		// SWAP

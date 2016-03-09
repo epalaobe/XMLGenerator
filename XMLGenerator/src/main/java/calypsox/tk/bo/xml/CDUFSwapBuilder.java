@@ -7,9 +7,11 @@ import com.calypso.tk.core.Trade;
 import com.calypso.tk.marketdata.PricingEnv;
 import com.calypso.tk.product.CashSettleInfo;
 import com.calypso.tk.product.Swap;
+import com.calypso.tk.product.util.CompoundMethod;
 import com.calypso.tk.product.util.quotableReset.FXResetPurpose;
 import com.calypso.tk.upload.jaxb.CalypsoTrade;
 import com.calypso.tk.upload.jaxb.CashSettlementInfo;
+import com.calypso.tk.upload.jaxb.HolidayCodeType;
 
 /**
  * The Class CDUFProductSwap.
@@ -27,27 +29,22 @@ public class CDUFSwapBuilder extends AbstractCDUFProductBuilder {
 		com.calypso.tk.upload.jaxb.InterestRateSwap jaxbSwap = new com.calypso.tk.upload.jaxb.InterestRateSwap();
 		jaxbProduct.setInterestRateSwap(jaxbSwap);
 
-		jaxbSwap.setExerciseType(swap.getExerciseType());
-		jaxbSwap.setFxRate(swap.getInitialFXRate()); //required //nillable
-		jaxbSwap.setIndexResetDate(getIndexResetDate(swap)); //required //nillable
 		List<com.calypso.tk.upload.jaxb.SwapLeg> swapLegList = jaxbSwap.getSwapLeg();
 		fillLegs(swap, swapLegList); //required
 
-		// TODO: jaxbSwap.setMarkToMarket(); //required //nillable
-		// TODO: jaxbSwap.setMToMAdjFirst(swap.getAdjustFirstFlowB()); //required //nillable
+		jaxbSwap.setSettlementCurrency(swap.getCurrency());
+		jaxbSwap.setExerciseType(swap.getExerciseType());
+		jaxbSwap.setFxRate(swap.getInitialFXRate()); //required //nillable
+		jaxbSwap.setIndexResetDate(getIndexResetDate(swap)); //required //nillable
+		//Revisar
+		jaxbSwap.setMToMAdjFirst(swap.getAdjustFirstFlowB()); //required //nillable Menu
+		jaxbSwap.setFXResetHolidays(getFXResetHolidays(swap));
+		jaxbSwap.setFXResetOffset(getFXResetOffset(swap));
+		jaxbSwap.setSettlementFxReset(getSettlementFxReset(swap));
+		jaxbSwap.setSettlementFxResetHoliday(getSettlementFxResetHoliday(swap));
+		jaxbSwap.setSettlementFxResetOffSet(getSettlementFxResetOffset(swap));
 		
-		// TODO: jaxbSwap.setAutoAdjustStubB(value);
-		// TODO: jaxbSwap.setDiscounted(value);
-		// TODO: jaxbSwap.setExerciseSchedule(value);
-		// TODO: jaxbSwap.setForwardStartNotionalAdjustment(value);
-		// TODO: jaxbSwap.setFXResetHolidays(swap.getFXResetOverride(FXResetPurpose.PrincipalAdjustment).getHolidays());
-		// TODO: jaxbSwap.setFXResetOffset(swap.getFXResetOverride(FXResetPurpose.PrincipalAdjustment).getResetOffset());
-		// TODO: jaxbSwap.setNegociatedPrice(value);
-		// TODO: jaxbSwap.setPaySideFXReset(value);
-		// TODO: jaxbSwap.setSettlementCurrency(value);
-		// TODO: jaxbSwap.setSettlementFxReset(value);
-		// TODO: jaxbSwap.setSettlementFxResetHoliday(value);
-		// TODO: jaxbSwap.setSettlementFxResetOffSet();
+		// TODO: jaxbSwap.setMarkToMarket(); //required //nillable
 	}
 
 	/*
@@ -101,7 +98,7 @@ public class CDUFSwapBuilder extends AbstractCDUFProductBuilder {
 		fillLeg("Pay", swap.getPayLeg(), swapLegList);
 		fillLeg("Rec", swap.getReceiveLeg(), swapLegList);
 	}
-	
+
 	private void fillLeg(final String payRec, final com.calypso.tk.product.SwapLeg swapLeg, final List<com.calypso.tk.upload.jaxb.SwapLeg> swapLegList) {
 		com.calypso.tk.upload.jaxb.SwapLeg jaxbSwapLeg = new com.calypso.tk.upload.jaxb.SwapLeg();
 		jaxbSwapLeg.setPayRec(payRec);
@@ -110,13 +107,13 @@ public class CDUFSwapBuilder extends AbstractCDUFProductBuilder {
 		jaxbSwapLeg.setRateIndex(getRateIndex(swapLeg.getRateIndex()));
 		jaxbSwapLeg.setRateIndexSource(getRateIndexSource(swapLeg.getRateIndex()));
 		jaxbSwapLeg.setSpread(swapLeg.getSpread());
-		jaxbSwapLeg.setFixedRate(swapLeg.getAmortRate()); //Rate de la pata fija 4%
 		jaxbSwapLeg.setTenor(getTenor(swapLeg.getRateIndex())); //required
 		jaxbSwapLeg.setCurrency(swapLeg.getCurrency());
 		jaxbSwapLeg.setSpecificFirstDate(getXmlGregorianCalendarFromDate(swapLeg.getFirstStubDate())); //required
 		jaxbSwapLeg.setSpecificLastDate(getXmlGregorianCalendarFromDate(swapLeg.getLastStubDate())); //required
 		jaxbSwapLeg.setStartDate(getXmlGregorianCalendarFromDate(swapLeg.getStartDate()));
 		jaxbSwapLeg.setEndDate(getXmlGregorianCalendarFromDate(swapLeg.getEndDate()));
+		jaxbSwapLeg.setInterestCompounding(String.valueOf(swapLeg.getCompoundB())); //required
 		jaxbSwapLeg.setInterestCompoundingMethod(getCompoundMethod(swapLeg.getCompoundMethod())); //required
 		jaxbSwapLeg.setInterestCompoundingFrequency(getFrequency(swapLeg.getCompoundFrequency())); //required
 		jaxbSwapLeg.setResetRoll(getDateRoll(swapLeg.getResetDateRoll()));
@@ -124,27 +121,47 @@ public class CDUFSwapBuilder extends AbstractCDUFProductBuilder {
 		jaxbSwapLeg.setResetTiming(swapLeg.getResetTiming());
 		jaxbSwapLeg.setResetDateRule(getDateRule(swapLeg.getResetDateRule()));
 		@SuppressWarnings("unchecked")
-        Vector<String> resetHolidays = swapLeg.getResetHolidays();
+		Vector<String> resetHolidays = swapLeg.getResetHolidays();
 		jaxbSwapLeg.setResetHolidays(getHolidayCodeTypeFromVector(resetHolidays));
 		jaxbSwapLeg.setResetLag(getResetLag(swapLeg.getResetOffset(), swapLeg.getDefaultResetOffsetB(), swapLeg.getRateIndex())); //required
 		jaxbSwapLeg.setRatesRounding(swapLeg.getParamValue("RATE_ROUNDING")); //required
 		jaxbSwapLeg.setRatesRoundingDecPlaces(parseStringToInteger(swapLeg.getParamValue("RATE_ROUNDING_DEC"))); //required
-		jaxbSwapLeg.setFirstRate(String.valueOf(swapLeg.getFirstResetRate())); //required //Fijacion de primer flujo pata variable. 
 		jaxbSwapLeg.setFixedAmount(swapLeg.getFixedAmount());
+		jaxbSwapLeg.setResetMethod(swapLeg.getAveragingResetMethod()); //required
+		jaxbSwapLeg.setFixedRate(swapLeg.getFixedRate()); //Rate de la pata fija
+		jaxbSwapLeg.setBehavioralMaturity(getTenorName(swapLeg.getBehavioralMaturity()));
+		jaxbSwapLeg.setCompoundDateRule(getDateRule(swapLeg.getCompoundDateRule()));
+		jaxbSwapLeg.setCompoundWithSpreadB(getCompoundWithSpreadB(swapLeg));
+		jaxbSwapLeg.setCouponDateRule(getDateRule(swapLeg.getCouponDateRule()));
+		jaxbSwapLeg.setCouponOffsetBusDayB(swapLeg.getCouponOffsetBusDayB());
+		jaxbSwapLeg.setCouponPaymentAtEnd(swapLeg.getCouponPaymentAtEndB());
+		jaxbSwapLeg.setDiscountMethod(swapLeg.getDiscountMethodAsString());
+		jaxbSwapLeg.setIncludeFirstB(swapLeg.getIncludeFirstB());
+		jaxbSwapLeg.setIncludeLastB(swapLeg.getIncludeLastB());
+		jaxbSwapLeg.setInflationCalculationMethod(swapLeg.getInflationCalcMethod());
+		jaxbSwapLeg.setIntermediateCurrency(swapLeg.getIntermediateCurrency());
+		//////////// Revisar:
+		jaxbSwapLeg.setRate(swapLeg.getAmortRate());//required 
+		jaxbSwapLeg.setFirstRate(String.valueOf(swapLeg.getFirstResetRate())); //required
+		jaxbSwapLeg.setFirstReset(swapLeg.getManualInitFixing().getName()); //required 
 
-		// TODO: jaxbSwapLeg.setInterestCompounding(); //required
-		
+		jaxbSwapLeg.setResetFrequency(getFrequency(swapLeg.getCouponFrequency())); //required Payment Frequency
+		if (swapLeg.getParamValue("ROUNDING") != null) {
+			jaxbSwapLeg.setAmountsRounding(swapLeg.getParamValue("ROUNDING"));
+		} else {
+			jaxbSwapLeg.setAmountsRounding(swapLeg.getDefaultRounding()); //required
+		}
 
-		// TODO: jaxbSwapLeg.setResetFrequency(); //required
-
-		// TODO: jaxbSwapLeg.setResetMethod(); //required
-		// TODO: jaxbSwapLeg.setAmountsRounding(); //required
-		
-		// TODO: jaxbSwapLeg.setRate()//required //Rate en cuanto se contrata
-		// TODO: jaxbSwapLeg.setFloatingRateReset(); //required //fijacion de la tasa variable  Euribor 6 Meses VALOR DEL CALCULO TOTAL
-		// TODO: jaxbSwapLeg.setFirstReset(swapLeg.get); //required //dia de fijacion del la pata variable. START - RESETLAG
+		// TODO: jaxbSwapLeg.setFloatingRateReset(); //required //fijacion de la tasa variable  Euribor 6 Meses VALOR DEL CALCULO TOTAL del Rate
 		
 		swapLegList.add(jaxbSwapLeg);
+	}
+
+	private boolean getCompoundWithSpreadB(final com.calypso.tk.product.SwapLeg swapLeg){
+		if(swapLeg.getCompoundMethod()!=null){
+			return swapLeg.getCompoundMethod().getCashFlowGeneratorName().equals(CompoundMethod.SPREAD.getDisplayName());
+		}
+		return false;
 	}
 
 	private boolean getIndexResetDate(final com.calypso.tk.product.Swap swap){
@@ -152,5 +169,42 @@ public class CDUFSwapBuilder extends AbstractCDUFProductBuilder {
 			return swap.getFXResetOverride(FXResetPurpose.PrincipalAdjustment).getUseIndexResetDateB();
 		}
 		return false;
+	}
+
+	private HolidayCodeType getFXResetHolidays(final com.calypso.tk.product.Swap swap){
+		if(swap.getFXResetOverride(FXResetPurpose.PrincipalAdjustment)!=null){
+			Vector<String> fxResetHolidays = swap.getFXResetOverride(FXResetPurpose.PrincipalAdjustment).getHolidays();
+			return getHolidayCodeTypeFromVector(fxResetHolidays);
+		}
+		return null;
+	}
+
+	private Integer getFXResetOffset(final com.calypso.tk.product.Swap swap){
+		if(swap.getFXResetOverride(FXResetPurpose.PrincipalAdjustment)!=null){
+			return swap.getFXResetOverride(FXResetPurpose.PrincipalAdjustment).getResetOffset();
+		}
+		return null;
+	}
+
+	private HolidayCodeType getSettlementFxResetHoliday(final com.calypso.tk.product.Swap swap){
+		if(swap.getFloatLeg()!=null && swap.getFloatLeg().getSettlementFXResetOverride()!=null){
+			Vector<String> fxResetHolidays = swap.getFloatLeg().getSettlementFXResetOverride().getHolidays();
+			return getHolidayCodeTypeFromVector(fxResetHolidays);
+		}
+		return null;
+	}
+
+	private String getSettlementFxReset(final com.calypso.tk.product.Swap swap){
+		if(swap.getFloatLeg()!=null && swap.getFloatLeg().getSettlementFXResetOverride()!=null){
+			return swap.getFloatLeg().getSettlementFXResetOverride().toString();
+		}
+		return null;
+	}
+
+	private String getSettlementFxResetOffset(final com.calypso.tk.product.Swap swap){
+		if(swap.getFloatLeg()!=null && swap.getFloatLeg().getSettlementFXResetOverride()!=null){
+			return String.valueOf(swap.getFloatLeg().getSettlementFXResetOverride().getResetOffset());
+		}
+		return null;
 	}
 }

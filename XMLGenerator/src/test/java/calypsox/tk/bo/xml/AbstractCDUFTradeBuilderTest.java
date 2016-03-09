@@ -59,9 +59,7 @@ public class AbstractCDUFTradeBuilderTest {
 	 */
 	@Test
 	public final void testFillTradeHeader() {
-
-
-
+		fail("Not yet implemented"); // TODO
 	}
 
 	/**
