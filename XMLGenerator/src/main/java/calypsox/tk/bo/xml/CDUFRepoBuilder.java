@@ -6,14 +6,10 @@ import java.util.Vector;
 import com.calypso.tk.core.Trade;
 import com.calypso.tk.marketdata.PricingEnv;
 import com.calypso.tk.product.Collateral;
-import com.calypso.tk.refdata.Haircut;
 import com.calypso.tk.secfinance.SecFinanceTkUtil;
 import com.calypso.tk.upload.jaxb.BondDetail;
 import com.calypso.tk.upload.jaxb.BondDetails;
 import com.calypso.tk.upload.jaxb.CalypsoTrade;
-import com.calypso.tk.upload.jaxb.EquityDetail;
-import com.calypso.tk.upload.jaxb.EquityDetails;
-import com.calypso.tk.upload.jaxb.HaircutDetails;
 import com.calypso.tk.upload.jaxb.RepoDetails;
 import com.calypso.tk.upload.jaxb.RepoFunding;
 import com.calypso.tk.upload.jaxb.SecurityDetails;
@@ -33,17 +29,17 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 		com.calypso.tk.upload.jaxb.Repo jaxbRepo = new com.calypso.tk.upload.jaxb.Repo();
 		jaxbProduct.setRepo(jaxbRepo);
 
-		jaxbRepo.setRepoType(com.calypso.tk.product.Repo.getRepoType(repo));  //Continuous
-		jaxbRepo.setAllocationType(repo.getAllocationType()); 
-		jaxbRepo.setCallableBy(getCallableBy(repo.getCallableBy())); 
-		jaxbRepo.setDirection(repo.getDirection()); 
-		jaxbRepo.setFillType(repo.getFillType());  
-		jaxbRepo.setFundingDetails(getRepoFunding(repo)); 
-		jaxbRepo.setNoticeDays(repo.getNoticeDays()); 
-		jaxbRepo.setRepoDetails(getRepoDetails(repo)); 
-		jaxbRepo.setSubstitutionDetails(getSubstitutionDetails(repo)); 
-		jaxbRepo.setOpenTerm(getOpenTerm(repo.getOpenTermB(), repo.isContinuous())); 
-		jaxbRepo.setSecurityDetails(getSecurityDetails(repo));  
+		jaxbRepo.setRepoType(com.calypso.tk.product.Repo.getRepoType(repo)); //required Continuous
+		jaxbRepo.setAllocationType(repo.getAllocationType()); //required
+		jaxbRepo.setCallableBy(getCallableBy(repo.getCallableBy())); //required
+		jaxbRepo.setDirection(repo.getDirection()); //required
+		jaxbRepo.setFillType(repo.getFillType()); //required 
+		jaxbRepo.setFundingDetails(getRepoFunding(repo)); //required
+		jaxbRepo.setNoticeDays(repo.getNoticeDays()); //required
+		jaxbRepo.setRepoDetails(getRepoDetails(repo)); //required
+		jaxbRepo.setSubstitutionDetails(getSubstitutionDetails(repo)); //required
+		jaxbRepo.setOpenTerm(getOpenTerm(repo.getOpenTermB(), repo.isContinuous())); //required
+		jaxbRepo.setSecurityDetails(getSecurityDetails(repo)); //required 
 		jaxbRepo.setShowCleanPriceInDecimalB(SecFinanceTkUtil.getShowCleanPriceInDecimalUserProperty(repo.getProductFamily()));
 
 	}
@@ -68,21 +64,21 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 		com.calypso.tk.product.Cash cash = repo.getCash();
 
 		if(cash!=null){
-			repoFunding.setCurrency(cash.getCurrency()); 
-			repoFunding.setRateIndex(getRateIndex(cash.getRateIndex())); 
-			repoFunding.setRateIndexSource(getRateIndexSource(cash.getRateIndex())); 
-			repoFunding.setTenor(getTenor(cash.getRateIndex())); 
+			repoFunding.setCurrency(cash.getCurrency()); //required
+			repoFunding.setRateIndex(getRateIndex(cash.getRateIndex())); //required
+			repoFunding.setRateIndexSource(getRateIndexSource(cash.getRateIndex())); //required
+			repoFunding.setTenor(getTenor(cash.getRateIndex())); //required
 			repoFunding.setPrincipal(cash.getPrincipal());
-			repoFunding.setCouponFrequency(getFrequency(cash.getPaymentFrequency())); 
-			repoFunding.setFundingType(cash.getRateType()); 
+			repoFunding.setCouponFrequency(getFrequency(cash.getPaymentFrequency())); //required
+			repoFunding.setFundingType(cash.getRateType()); //required
 			repoFunding.setFundingRate(cash.getFixedRate());
 			repoFunding.setIndexFactor(cash.getIndexFactor());
 
-			repoFunding.setDayCountConvention(getDayCount(repo.getDayCount())); 
+			repoFunding.setDayCountConvention(getDayCount(repo.getDayCount())); //required
 
 			if(repo.isJGB()){
 				com.calypso.tk.product.JGBRepo jgbRepo = (com.calypso.tk.product.JGBRepo)repo;
-				repoFunding.setJGBType(jgbRepo.getType());  
+				repoFunding.setJGBType(jgbRepo.getType()); //required //nillable
 				repoFunding.setBorrowRate(jgbRepo.getBorrowRate());
 			}
 		}
@@ -119,82 +115,40 @@ public class CDUFRepoBuilder extends AbstractCDUFProductBuilder{
 		securityDetails.setFXPrimaryCurrency(repo.getSecurity().getPrimaryCurrency());
 		// TODO: securityDetails.setMarginFlagB(repo.getHaircut()); 
 		securityDetails.setBondDetails(getBondDetails(repo));
-		securityDetails.setEquityDetails(getEquityDetails(repo));
+		// TODO: securityDetails.setEquityDetails(getEquityDetails(repo));
+
 		return securityDetails;
 	}
 
 	private BondDetails getBondDetails(final com.calypso.tk.product.Repo repo){
-		if(repo.getSecurity() instanceof com.calypso.tk.product.Bond){
-			BondDetails bondDetails = new BondDetails();
-			List<BondDetail> listBondDetails = bondDetails.getBondDetail();
+		BondDetails bondDetails = new BondDetails();
+		List<BondDetail> listBondDetails = bondDetails.getBondDetail();
+		
+		Vector<Collateral> collaterals = repo.getCollaterals();
+		for(Collateral collateral : collaterals){
 
-			Vector<Collateral> collaterals = repo.getCollaterals();
-			for(Collateral collateral : collaterals){
-				BondDetail bondDetail = new BondDetail();
-				bondDetail.setCleanPrice(collateral.getNegociatedPrice()); //collateral.getInitialPrice()
-				bondDetail.setDirtyPrice(collateral.getDirtyPrice());
-				bondDetail.setFxRate(collateral.getInitialFXRate());
-				bondDetail.setNominal(collateral.getNominal());
-				bondDetail.setQuantity(collateral.getQuantity());
-				bondDetail.setValue(collateral.getValue());
-				bondDetail.setHaircutDetails(getHaircutDetails(collateral));
-				bondDetail.setYield(collateral.getYieldPrice());
-				// TODO: bondDetail.setProductCodeType();
-				// TODO: bondDetail.setProductCodeValue();
-				// TODO: bondDetail.setRemoveB();
-				// TODO: bondDetail.setUseQuantityB();
-				// TODO: bondDetail.setAdjustedPrice();
-				listBondDetails.add(bondDetail);
-
-			}
-			return bondDetails;
-		}else{
-			return null;
+			BondDetail bondDetail = new BondDetail();
+			bondDetail.setCleanPrice(collateral.getNegociatedPrice());
+			bondDetail.setDirtyPrice(collateral.getDirtyPrice());
+			bondDetail.setFxRate(collateral.getInitialFXRate());
+			bondDetail.setNominal(collateral.getNominal());
+			bondDetail.setQuantity(collateral.getQuantity());
+			bondDetail.setValue(collateral.getValue());
+			// TODO: bondDetail.setYield();
+			// TODO: bondDetail.setHaircutDetails(collateral.getHaircut());
+			// TODO: bondDetail.setProductCodeType();
+			// TODO: bondDetail.setProductCodeValue();
+			// TODO: bondDetail.setRemoveB();
+			// TODO: bondDetail.setUseQuantityB();
+			// TODO: bondDetail.setAdjustedPrice();
+			listBondDetails.add(bondDetail);
+			
 		}
+
+
+		return bondDetails;
 	}
-
-
-	private EquityDetails getEquityDetails(final com.calypso.tk.product.Repo repo){
-		if(repo.getSecurity() instanceof com.calypso.tk.product.Equity){
-			EquityDetails equityDetails = new EquityDetails();
-			List<EquityDetail> listEquityDetails = equityDetails.getEquityDetail();
-
-			Vector<Collateral> collaterals = repo.getCollaterals();
-			for(Collateral collateral : collaterals){
-				EquityDetail equityDetail = new EquityDetail();
-				equityDetail.setFxRate(collateral.getInitialFXRate());
-				equityDetail.setQuantity(collateral.getQuantity());
-				equityDetail.setValue(collateral.getValue());
-				equityDetail.setYieldPrice(collateral.getYieldPrice());
-				equityDetail.setInterestPrice(collateral.getInterestPrice());
-				equityDetail.setPassThroughB(collateral.getPassThrough());
-				equityDetail.setHaircutDetails(getHaircutDetails(collateral));
-				// TODO: equityDetail.setAdjustedPrice();
-				// TODO: equityDetail.setClosingPrice();
-				// TODO: equityDetail.setPrice();
-				// TODO: equityDetail.setProductCodeType();
-				// TODO: equityDetail.setProductCodeValue();
-				// TODO: equityDetail.setRemoveB();
-
-				listEquityDetails.add(equityDetail);
-
-			}
-			return equityDetails;
-		}else{
-			return null;
-		}
-	}
-
-	private HaircutDetails getHaircutDetails(final Collateral collateral){
-		HaircutDetails haircutDetails = new HaircutDetails();
-		///////////////////REVISAR///////////////
-		haircutDetails.setHairCutBase(collateral.getHaircutQuoteType());
-		haircutDetails.setHairCutDirection(Haircut.getDirection(collateral.getHaircutSign()));
-		haircutDetails.setHairCutPercentage(collateral.getHaircut());
-		haircutDetails.setHairCutType(collateral.getHaircutType());
-		return haircutDetails;
-	}
-
+	
 	private String getOpenTerm(final boolean isOpen, final boolean isContinuous){
 		if(isOpen){
 			return "OPEN";

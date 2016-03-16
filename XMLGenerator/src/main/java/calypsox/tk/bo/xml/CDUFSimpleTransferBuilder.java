@@ -19,12 +19,12 @@ public class CDUFSimpleTransferBuilder extends AbstractCDUFProductBuilder {
 		com.calypso.tk.upload.jaxb.SimpleTransfer jaxbSimpleTransfer = new com.calypso.tk.upload.jaxb.SimpleTransfer();
 		jaxbProduct.setSimpleTransfer(jaxbSimpleTransfer);
 
-		jaxbSimpleTransfer.setType(simpleTransfer.getType()); 
-		jaxbSimpleTransfer.setSimpleTransferType(simpleTransfer.getSubType()); 
-		jaxbSimpleTransfer.setSimpleTransferSecurity(getSimpleTransferSecurity(simpleTransfer)); 
-		// TODO: jaxbSimpleTransfer.setTradeDirection();  //pay o receive
+		jaxbSimpleTransfer.setType(simpleTransfer.getType()); //required
+		jaxbSimpleTransfer.setSimpleTransferType(simpleTransfer.getSubType()); //required
+		jaxbSimpleTransfer.setSimpleTransferSecurity(getSimpleTransferSecurity(simpleTransfer)); //required
+		// TODO: jaxbSimpleTransfer.setTradeDirection(); //required //pay o receive
 		jaxbSimpleTransfer.setFromLegalEntityRole(simpleTransfer.getOrdererRole()); // To or From
-		jaxbSimpleTransfer.setFromLegalEntity(getLegalEntity(simpleTransfer.getOrdererLeId()));
+		// TODO: jaxbSimpleTransfer.setFromLegalEntity(getLegalEntity(simpleTransfer.getOrdererLeId()));
 	}
 
 	/* (non-Javadoc)
@@ -42,11 +42,10 @@ public class CDUFSimpleTransferBuilder extends AbstractCDUFProductBuilder {
 		SimpleTransferSecurity simpleTransferSecurity = new SimpleTransferSecurity();
 		if(simpleTransfer.getSecurity()!=null){
 			// TODO: simpleTransferSecurity.setAccrual();
-			
 			simpleTransferSecurity.setDeliveryAgainstPaymentB(simpleTransfer.getIsDAP());
 			simpleTransferSecurity.setDeliveryAgainstPaymentCashAmount(simpleTransfer.getDAPCashAmount());
 			simpleTransferSecurity.setDeliveryAgainstPaymentCurrency(getSecurityCurrency(simpleTransfer.getSecurity()));
-			//simpleTransferSecurity.setDeliveryAgainstPaymentFXRate(simpleTransfer.getF);
+			// TODO: simpleTransferSecurity.setDeliveryAgainstPaymentFXRate();
 			// TODO: simpleTransferSecurity.setDirtyPrice();
 			simpleTransferSecurity.setNominal(simpleTransfer.getPrincipal());
 			simpleTransferSecurity.setPledgedSecurityB(simpleTransfer.getIsPledgeMovementB());

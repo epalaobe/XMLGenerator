@@ -30,21 +30,21 @@ public class CDUFSwapBuilder extends AbstractCDUFProductBuilder {
 		jaxbProduct.setInterestRateSwap(jaxbSwap);
 
 		List<com.calypso.tk.upload.jaxb.SwapLeg> swapLegList = jaxbSwap.getSwapLeg();
-		fillLegs(swap, swapLegList); 
+		fillLegs(swap, swapLegList); //required
 
 		jaxbSwap.setSettlementCurrency(swap.getCurrency());
 		jaxbSwap.setExerciseType(swap.getExerciseType());
-		jaxbSwap.setFxRate(swap.getInitialFXRate());  
-		jaxbSwap.setIndexResetDate(getIndexResetDate(swap));  
+		jaxbSwap.setFxRate(swap.getInitialFXRate()); //required //nillable
+		jaxbSwap.setIndexResetDate(getIndexResetDate(swap)); //required //nillable
 		//Revisar
-		jaxbSwap.setMToMAdjFirst(swap.getAdjustFirstFlowB());
+		jaxbSwap.setMToMAdjFirst(swap.getAdjustFirstFlowB()); //required //nillable Menu
 		jaxbSwap.setFXResetHolidays(getFXResetHolidays(swap));
 		jaxbSwap.setFXResetOffset(getFXResetOffset(swap));
 		jaxbSwap.setSettlementFxReset(getSettlementFxReset(swap));
 		jaxbSwap.setSettlementFxResetHoliday(getSettlementFxResetHoliday(swap));
 		jaxbSwap.setSettlementFxResetOffSet(getSettlementFxResetOffset(swap));
 		
-		// TODO: jaxbSwap.setMarkToMarket();  
+		// TODO: jaxbSwap.setMarkToMarket(); //required //nillable
 	}
 
 	/*
@@ -107,70 +107,56 @@ public class CDUFSwapBuilder extends AbstractCDUFProductBuilder {
 		jaxbSwapLeg.setRateIndex(getRateIndex(swapLeg.getRateIndex()));
 		jaxbSwapLeg.setRateIndexSource(getRateIndexSource(swapLeg.getRateIndex()));
 		jaxbSwapLeg.setSpread(swapLeg.getSpread());
-		jaxbSwapLeg.setTenor(getTenor(swapLeg.getRateIndex())); 
+		jaxbSwapLeg.setTenor(getTenor(swapLeg.getRateIndex())); //required
 		jaxbSwapLeg.setCurrency(swapLeg.getCurrency());
-		jaxbSwapLeg.setSpecificFirstDate(getXmlGregorianCalendarFromDate(swapLeg.getFirstStubDate())); 
-		jaxbSwapLeg.setSpecificLastDate(getXmlGregorianCalendarFromDate(swapLeg.getLastStubDate())); 
+		jaxbSwapLeg.setSpecificFirstDate(getXmlGregorianCalendarFromDate(swapLeg.getFirstStubDate())); //required
+		jaxbSwapLeg.setSpecificLastDate(getXmlGregorianCalendarFromDate(swapLeg.getLastStubDate())); //required
 		jaxbSwapLeg.setStartDate(getXmlGregorianCalendarFromDate(swapLeg.getStartDate()));
 		jaxbSwapLeg.setEndDate(getXmlGregorianCalendarFromDate(swapLeg.getEndDate()));
-		jaxbSwapLeg.setInterestCompounding(String.valueOf(swapLeg.getCompoundB())); 
-		jaxbSwapLeg.setInterestCompoundingMethod(getCompoundMethod(swapLeg.getCompoundMethod())); 
-		jaxbSwapLeg.setInterestCompoundingFrequency(getFrequency(swapLeg.getCompoundFrequency())); 
+		jaxbSwapLeg.setInterestCompounding(String.valueOf(swapLeg.getCompoundB())); //required
+		jaxbSwapLeg.setInterestCompoundingMethod(getCompoundMethod(swapLeg.getCompoundMethod())); //required
+		jaxbSwapLeg.setInterestCompoundingFrequency(getFrequency(swapLeg.getCompoundFrequency())); //required
 		jaxbSwapLeg.setResetRoll(getDateRoll(swapLeg.getResetDateRoll()));
 		jaxbSwapLeg.setResetOffsetBusDayB(swapLeg.getResetOffsetBusDayB());
 		jaxbSwapLeg.setResetTiming(swapLeg.getResetTiming());
 		jaxbSwapLeg.setResetDateRule(getDateRule(swapLeg.getResetDateRule()));
-		jaxbSwapLeg.setResetHolidays(getResetHolidays(swapLeg));
-		jaxbSwapLeg.setResetLag(getResetLag(swapLeg.getResetOffset(), swapLeg.getDefaultResetOffsetB(), swapLeg.getRateIndex())); 
-		jaxbSwapLeg.setRatesRounding(swapLeg.getParamValue("RATE_ROUNDING")); 
-		jaxbSwapLeg.setRatesRoundingDecPlaces(parseStringToInteger(swapLeg.getParamValue("RATE_ROUNDING_DEC"))); 
+		@SuppressWarnings("unchecked")
+		Vector<String> resetHolidays = swapLeg.getResetHolidays();
+		jaxbSwapLeg.setResetHolidays(getHolidayCodeTypeFromVector(resetHolidays));
+		jaxbSwapLeg.setResetLag(getResetLag(swapLeg.getResetOffset(), swapLeg.getDefaultResetOffsetB(), swapLeg.getRateIndex())); //required
+		jaxbSwapLeg.setRatesRounding(swapLeg.getParamValue("RATE_ROUNDING")); //required
+		jaxbSwapLeg.setRatesRoundingDecPlaces(parseStringToInteger(swapLeg.getParamValue("RATE_ROUNDING_DEC"))); //required
 		jaxbSwapLeg.setFixedAmount(swapLeg.getFixedAmount());
-		jaxbSwapLeg.setResetMethod(swapLeg.getAveragingResetMethod()); 
-		jaxbSwapLeg.setFixedRate(swapLeg.getFixedRate()); 
+		jaxbSwapLeg.setResetMethod(swapLeg.getAveragingResetMethod()); //required
+		jaxbSwapLeg.setFixedRate(swapLeg.getFixedRate()); //Rate de la pata fija
 		jaxbSwapLeg.setBehavioralMaturity(getTenorName(swapLeg.getBehavioralMaturity()));
 		jaxbSwapLeg.setCompoundDateRule(getDateRule(swapLeg.getCompoundDateRule()));
 		jaxbSwapLeg.setCompoundWithSpreadB(getCompoundWithSpreadB(swapLeg));
 		jaxbSwapLeg.setCouponDateRule(getDateRule(swapLeg.getCouponDateRule()));
-		jaxbSwapLeg.setCouponOffsetBusDayB(swapLeg.getCouponOffsetBusDayB()); //108
+		jaxbSwapLeg.setCouponOffsetBusDayB(swapLeg.getCouponOffsetBusDayB());
 		jaxbSwapLeg.setCouponPaymentAtEnd(swapLeg.getCouponPaymentAtEndB());
 		jaxbSwapLeg.setDiscountMethod(swapLeg.getDiscountMethodAsString());
 		jaxbSwapLeg.setIncludeFirstB(swapLeg.getIncludeFirstB());
 		jaxbSwapLeg.setIncludeLastB(swapLeg.getIncludeLastB());
 		jaxbSwapLeg.setInflationCalculationMethod(swapLeg.getInflationCalcMethod());
 		jaxbSwapLeg.setIntermediateCurrency(swapLeg.getIntermediateCurrency());
-		jaxbSwapLeg.setDayCountConvention(getDayCount(swapLeg.getDayCount())); //109
-		jaxbSwapLeg.setDateRollConvention(getDateRoll(swapLeg.getCouponDateRoll())); //104
-		jaxbSwapLeg.setRollDay(String.valueOf(swapLeg.getRollingDay())); //106
-		jaxbSwapLeg.setSampleTiming(swapLeg.getSampleTiming()); //102
-		jaxbSwapLeg.setFloatingRateReset(String.valueOf(swapLeg.getIndexFactor())); //101
 		//////////// Revisar:
-		jaxbSwapLeg.setRate(swapLeg.getAmortRate()); 
-		jaxbSwapLeg.setFirstRate(String.valueOf(swapLeg.getFirstResetRate())); 
-		jaxbSwapLeg.setFirstReset(swapLeg.getManualInitFixing().getName());  
-		jaxbSwapLeg.setResetFrequency(getFrequency(swapLeg.getCouponFrequency())); // Payment Frequency
-		jaxbSwapLeg.setAmountsRounding(getAmountsRounding(swapLeg));
-		//swapLeg.getEmbeddedOptionType(); //105
-		//swapLeg.getCouponOffset(); //107 
-		//swapLeg.getCompoundSpread(); //110
-		//swapLeg.getId(); //99
-		//swapLeg.getCouponHolidays(); // 103
+		jaxbSwapLeg.setRate(swapLeg.getAmortRate());//required 
+		jaxbSwapLeg.setFirstRate(String.valueOf(swapLeg.getFirstResetRate())); //required
+		jaxbSwapLeg.setFirstReset(swapLeg.getManualInitFixing().getName()); //required 
+
+		jaxbSwapLeg.setResetFrequency(getFrequency(swapLeg.getCouponFrequency())); //required Payment Frequency
+		if (swapLeg.getParamValue("ROUNDING") != null) {
+			jaxbSwapLeg.setAmountsRounding(swapLeg.getParamValue("ROUNDING"));
+		} else {
+			jaxbSwapLeg.setAmountsRounding(swapLeg.getDefaultRounding()); //required
+		}
+
+		// TODO: jaxbSwapLeg.setFloatingRateReset(); //required //fijacion de la tasa variable  Euribor 6 Meses VALOR DEL CALCULO TOTAL del Rate
+		
 		swapLegList.add(jaxbSwapLeg);
 	}
 
-	private HolidayCodeType getResetHolidays(final com.calypso.tk.product.SwapLeg swapLeg){
-		@SuppressWarnings("unchecked")
-		Vector<String> resetHolidays = swapLeg.getResetHolidays();
-		return getHolidayCodeTypeFromVector(resetHolidays);
-	} 
-	
-	private String getAmountsRounding(final com.calypso.tk.product.SwapLeg swapLeg){
-		if (swapLeg.getParamValue("ROUNDING") == null) {
-			return swapLeg.getDefaultRounding(); 
-		} else {
-			return swapLeg.getParamValue("ROUNDING");
-		}
-	} 
-	
 	private boolean getCompoundWithSpreadB(final com.calypso.tk.product.SwapLeg swapLeg){
 		if(swapLeg.getCompoundMethod()!=null){
 			return swapLeg.getCompoundMethod().getCashFlowGeneratorName().equals(CompoundMethod.SPREAD.getDisplayName());

@@ -20,9 +20,6 @@ import com.calypso.tk.core.Trade;
 import com.calypso.tk.product.CashSettleInfo;
 import com.calypso.tk.product.Swap;
 import com.calypso.tk.product.SwapLeg;
-import com.calypso.tk.product.util.CompoundMethod;
-import com.calypso.tk.product.util.quotableReset.FXResetPurpose;
-import com.calypso.tk.refdata.FXResetOverrideImpl;
 import com.calypso.tk.upload.jaxb.CalypsoTrade;
 
 /**
@@ -46,7 +43,7 @@ public class CDUFSwapBuilderTest {
 
 		CalypsoTrade calypsoTrade = new CalypsoTrade();
 
-		assertEquals((Double)0.0, (Double)calypsoTrade.getTradeNotional());
+		assertTrue(calypsoTrade.getTradeNotional()==0);
 		assertNull(calypsoTrade.getStartDate());
 
 		CDUFSwapBuilder builder = new CDUFSwapBuilder();
@@ -54,7 +51,7 @@ public class CDUFSwapBuilderTest {
 
 		assertNotNull(calypsoTrade.getTradeNotional());
 		assertNotNull(calypsoTrade.getStartDate());
-		assertEquals((Double)1000.0, (Double)calypsoTrade.getTradeNotional());
+		assertTrue(calypsoTrade.getTradeNotional()==1000.0);
 		assertEquals(jdate.getDayOfMonth(), calypsoTrade.getStartDate().getDay());
 
 	}
@@ -88,75 +85,6 @@ public class CDUFSwapBuilderTest {
 		assertEquals("TestType", jaxbSwap.getExerciseType());
 		assertEquals((Double) 1.0 , jaxbSwap.getFxRate());
 	}
-	
-	/**
-	 * Test method for {@link calypsox.tk.bo.xml.CDUFSwapBuilder#fillProduct(com.calypso.tk.marketdata.PricingEnv, com.calypso.tk.core.Trade, com.calypso.tk.upload.jaxb.Product)}.
-	 */
-	@Test
-	public final void testFillProduct2() {
-		Trade trade = new Trade();
-		trade.setProduct(new Swap());
-
-		Swap swap  = (Swap) trade.getProduct();
-		
-		FXResetOverrideImpl fxResetOverrride = new FXResetOverrideImpl();
-		fxResetOverrride.setUseIndexResetDateB(true);
-		fxResetOverrride.setHolidays(new Vector<String>());
-		fxResetOverrride.setResetOffset(2);
-		swap.setFXResetOverride(FXResetPurpose.PrincipalAdjustment, fxResetOverrride);
-
-		com.calypso.tk.upload.jaxb.Product jaxbProduct = new com.calypso.tk.upload.jaxb.Product();
-
-		assertNull(jaxbProduct.getInterestRateSwap());
-
-		CDUFSwapBuilder builder = new CDUFSwapBuilder();
-		builder.fillProduct(null, trade, jaxbProduct);
-
-		com.calypso.tk.upload.jaxb.InterestRateSwap jaxbSwap = jaxbProduct.getInterestRateSwap();
-
-		assertNotNull(jaxbSwap);
-		assertEquals((Integer)2, jaxbSwap.getFXResetOffset());
-		assertNull(jaxbSwap.getFXResetHolidays());
-		assertTrue(jaxbSwap.isIndexResetDate());
-	}
-	
-	/**
-	 * Test method for {@link calypsox.tk.bo.xml.CDUFSwapBuilder#fillProduct(com.calypso.tk.marketdata.PricingEnv, com.calypso.tk.core.Trade, com.calypso.tk.upload.jaxb.Product)}.
-	 */
-	@Test
-	public final void testFillProduct3() {
-		Trade trade = new Trade();
-		trade.setProduct(new Swap());
-
-		Swap swap  = (Swap) trade.getProduct();
-		
-		FXResetOverrideImpl fxResetOverrride = new FXResetOverrideImpl();
-		fxResetOverrride.setHolidays(new Vector<String>());
-		fxResetOverrride.setResetOffset(2);
-		
-		SwapLeg swapLegPay = new SwapLeg();
-		swapLegPay.setLegType("Float");
-		swapLegPay.setIntermediateCurrency("EUR");
-		swapLegPay.setPrincipalCurrency("USD");
-		swapLegPay.setCurrency("EUR");
-		swapLegPay.setFXResetOverride(FXResetPurpose.IntermediateToSettlementConversion, fxResetOverrride);
-		
-		swap.setSwapLeg(swapLegPay, true);
-
-		com.calypso.tk.upload.jaxb.Product jaxbProduct = new com.calypso.tk.upload.jaxb.Product();
-
-		assertNull(jaxbProduct.getInterestRateSwap());
-
-		CDUFSwapBuilder builder = new CDUFSwapBuilder();
-		builder.fillProduct(null, trade, jaxbProduct);
-
-		com.calypso.tk.upload.jaxb.InterestRateSwap jaxbSwap = jaxbProduct.getInterestRateSwap();
-
-		assertNotNull(jaxbSwap);
-		assertEquals("2", jaxbSwap.getSettlementFxResetOffSet());
-		assertEquals("NaN|2||false|false", jaxbSwap.getSettlementFxReset().toString());
-		assertNull(jaxbSwap.getSettlementFxResetHoliday());
-	}
 
 	/******** 
 	 * 
@@ -183,7 +111,7 @@ public class CDUFSwapBuilderTest {
 
 		CalypsoTrade calypsoTrade = new CalypsoTrade();
 
-		assertEquals((Double)0.0, (Double)calypsoTrade.getTradeNotional());
+		assertTrue(calypsoTrade.getTradeNotional()==0);
 		assertNull(calypsoTrade.getStartDate());
 
 		CDUFSwapBuilder builder = new CDUFSwapBuilder();
@@ -202,13 +130,11 @@ public class CDUFSwapBuilderTest {
 		Trade trade = new Trade();
 		trade.setProduct(new Swap());
 
+
 		SwapLeg swapLegPay = new SwapLeg();
-		swapLegPay.setLegType("Float");
-		swapLegPay.setParamValue("ROUNDING", "NEAREST");
-		swapLegPay.setCompoundMethod(null);
+		swapLegPay.setLegType("TestTypePay");
 		SwapLeg swapLegRec = new SwapLeg();
-		swapLegRec.setLegType("Fixed");
-		swapLegRec.setCompoundMethod(CompoundMethod.SPREAD);
+		swapLegRec.setLegType("TestTypeRec");
 
 		Swap swap  = (Swap) trade.getProduct();
 		swap.setSwapLeg(swapLegPay, true);
@@ -228,12 +154,9 @@ public class CDUFSwapBuilderTest {
 		assertNotNull(jaxbSwap.getSwapLeg());
 		for(com.calypso.tk.upload.jaxb.SwapLeg swapLeg : jaxbSwap.getSwapLeg()){
 			if(swapLeg.getPayRec().equals("Pay")){
-				assertEquals("Float", swapLeg.getLegType());
-				assertEquals("NEAREST", swapLeg.getAmountsRounding());
-			}
-			if(swapLeg.getPayRec().equals("Rec")){
-				assertEquals("Fixed", swapLeg.getLegType());
-				assertTrue(swapLeg.isCompoundWithSpreadB());
+				assertEquals("TestTypePay", swapLeg.getLegType());
+			}else if(swapLeg.getPayRec().equals("Rec")){
+				assertEquals("TestTypeRec", swapLeg.getLegType());
 			}
 		}
 	}
