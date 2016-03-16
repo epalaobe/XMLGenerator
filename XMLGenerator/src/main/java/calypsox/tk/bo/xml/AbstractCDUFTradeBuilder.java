@@ -59,7 +59,7 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 		// Trade Notional and StartDate information is from product data, then now it is in the FRA and IRS fillTradeHeader
 		// method.
 		// calypsoTrade.setTradeNotional();
-		// calypsoTrade.setStartDate(trade.get); //required
+		// calypsoTrade.setStartDate(trade.get); 
 		calypsoTrade.setSalesPerson(trade.getSalesPerson()); // required
 		calypsoTrade.setTradeBook(getBook(trade.getBook())); // required
 		calypsoTrade.setTradeCounterParty(getCounterParty(trade.getCounterParty())); // required
@@ -76,14 +76,10 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 		calypsoTrade.setMirrorBook(getBook(trade.getMirrorBook()));
 		calypsoTrade.setNegotiatedCurrency(trade.getNegotiatedCurrency());
 		calypsoTrade.setMarketPlace(getCounterPartyCountry(trade.getCounterParty()));
-
-		calypsoTrade.setProductSubType(trade.getProductSubType()); // required //nillable
-		calypsoTrade.setTradeId(Integer.valueOf(trade.getId())); // required //nillable
+		calypsoTrade.setProductSubType(trade.getProductSubType()); // required 
+		calypsoTrade.setTradeId(Integer.valueOf(trade.getId())); // required 
 		calypsoTrade.setTradeKeywords(getTradeKeywords(trade));
-
-		calypsoTrade.setReconventionList(getReconventionList(trade.getProduct()));
-		
-		// TODO: calypsoTrade.setTemplateName(); //required
+		// TODO: calypsoTrade.setTemplateName(); 
 		// TODO: calypsoTrade.setAllegeActionB();
 		// TODO: calypsoTrade.setCancelAction();
 		// TODO: calypsoTrade.setNovation();
@@ -157,49 +153,6 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 	}
 
 	/**
-	 * Fill a ReconventionList with data product.
-	 *
-	 * @param product the product
-	 * @return the ReconventionList of product
-	 */
-	com.calypso.tk.upload.jaxb.ReconventionList getReconventionList(final com.calypso.tk.core.Product product) {
-		com.calypso.tk.upload.jaxb.ReconventionList reconventionList = new com.calypso.tk.upload.jaxb.ReconventionList();
-		List<com.calypso.tk.upload.jaxb.ReconventionDetails> listReconventionDetails = reconventionList.getReconventionDetails();
-		List<com.calypso.tk.product.reconvention.Reconvention> reconventions = com.calypso.tk.product.reconvention.impl.ReconventionUtil.getReconventions(product);
-
-		for (com.calypso.tk.product.reconvention.Reconvention reconvention : reconventions) {
-			com.calypso.tk.upload.jaxb.ReconventionDetails reconventionDetails = new com.calypso.tk.upload.jaxb.ReconventionDetails();
-			reconventionDetails.setEffectiveDate(getXmlGregorianCalendarFromDate(reconvention.getEffectiveDate()));
-			reconventionDetails.setParameters(getReconventionParameters(reconvention));
-			reconventionDetails.setPreScheduledB(reconvention.getIsPrescheduled());
-			// TODO: reconventionDetails.setPrincipalStructure();
-			reconventionDetails.setReconventionDatetime(getXmlGregorianCalendarFromDate(reconvention.getReconventionDatetime().getJDate(null)));
-			reconventionDetails.setType(getReconventionType(reconvention.getReconventionType()));
-			listReconventionDetails.add(reconventionDetails);
-		}
-		return null;
-	}
-
-	/**
-	 * Fill Parameters Object with reconvention data.
-	 *
-	 * @param reconvention the reconvention
-	 * @return the Parameters Object with reconvention data.
-	 */
-	com.calypso.tk.upload.jaxb.Parameters getReconventionParameters(final com.calypso.tk.product.reconvention.Reconvention reconvention) {
-		com.calypso.tk.upload.jaxb.Parameters parameters = new com.calypso.tk.upload.jaxb.Parameters();
-		List<com.calypso.tk.upload.jaxb.Parameter> listParameters = parameters.getParameter();
-		List<com.calypso.tk.product.reconvention.ReconventionParameter<?>> reconventionParameters = reconvention.getReconventionParameters();
-		for (com.calypso.tk.product.reconvention.ReconventionParameter<?> reconventionParameter : reconventionParameters) {
-			com.calypso.tk.upload.jaxb.Parameter parameter = new com.calypso.tk.upload.jaxb.Parameter();
-			parameter.setParameterName(reconventionParameter.getName());
-			parameter.setParameterValue(String.valueOf(reconventionParameter.getValue()));
-			listParameters.add(parameter);
-		}
-		return parameters;
-	}
-
-	/**
 	 * Get de cash flows of product
 	 * 
 	 * @param pricingEnv the pricing enviroment
@@ -236,6 +189,11 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 				jaxbCashflow.setEndDate(getXmlGregorianCalendarFromDate(cashflow.getEndDate()));
 				jaxbCashflow.setStartDate(getXmlGregorianCalendarFromDate(cashflow.getStartDate()));
 				jaxbCashflow.setRoundingMethod(getRoundingMethod(cashflow.getRoundingMethod()));
+				jaxbCashflow.setFlowType(cashflow.getType());  //727
+                //cashflow.getFXRate();  726
+                //cashflow.getFXResetDate();  725
+				// cashflow.getId(); 720
+				//cashflow.getNotionalCurrency(); 722
 				cfList.add(jaxbCashflow);
 			}
 		}
@@ -318,17 +276,6 @@ public abstract class AbstractCDUFTradeBuilder implements CDUFTradeBuilder {
 	String getRoundingMethod(final com.calypso.tk.core.RoundingMethod reoundingMethod) {
 		if (reoundingMethod != null) {
 			return reoundingMethod.toString();
-		}
-		return null;
-	}
-
-	/**
-	 * @param reconventionType the reconvention type
-	 * @return the string with reconvention type name
-	 */
-	String getReconventionType(final com.calypso.tk.product.reconvention.ReconventionType reconventionType) {
-		if (reconventionType != null) {
-			return reconventionType.toString();
 		}
 		return null;
 	}

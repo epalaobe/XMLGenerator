@@ -23,8 +23,8 @@ public class CDUFTradeXMLGeneratorMain {
 	private static String SQL = "product_desc.product_type  IN (\'TYPE\')";
 
 	public static void main(final String[] args) throws Exception {
-		DSConnection dsConnection = ConnectionUtil.connect(args, "MainEntry");
-		final PricingEnv pricingEnv = DSConnection.getDefault().getRemoteMarketData().getPricingEnv("OFFICIAL"); // RISK
+		DSConnection dsConnection = ConnectionUtil.connect(args, "MainEntry"); 
+		final PricingEnv pricingEnv = DSConnection.getDefault().getRemoteMarketData().getPricingEnv("default"); // RISK
 																													// V14.0
 
 		generateMsgFromTrades(dsConnection, pricingEnv);
@@ -52,7 +52,7 @@ public class CDUFTradeXMLGeneratorMain {
 						OUTPUT_DIR + '\\' + trade.getProductType() + '_' + trade.getId() + ".xml");
 				writer.write(stringBuffer.toString());
 				writer.close();
-				System.out.println("Generado " + i + " de " + n);
+				System.out.println("Generado " + type + ": "+ (i+1) + " de " + n);
 			}
 		}
 	}

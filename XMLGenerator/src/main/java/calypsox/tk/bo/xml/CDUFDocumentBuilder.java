@@ -1,5 +1,8 @@
 package calypsox.tk.bo.xml;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.calypso.tk.bo.BOMessage;
 import com.calypso.tk.core.Book;
 import com.calypso.tk.core.Trade;
@@ -52,6 +55,21 @@ public class CDUFDocumentBuilder {
 		customDataList.getCustomData().add(createCustomData("ProcessingOrganization", getProccesingOrg(trade.getBook())));
 		customDataList.getCustomData().add(createCustomData("TradeStatus", getStatus(trade.getStatus())));
 		customDataList.getCustomData().add(createCustomData("TradeEnteredUser", trade.getEnteredUser()));
+
+		addMessageAttributes(msg, customDataList.getCustomData());
+	}
+
+	private void addMessageAttributes(final BOMessage msg, final List<CustomData> customData) {
+		@SuppressWarnings("unchecked")
+		Vector<String> attrs = msg.getAttributes();
+
+		if (attrs != null) {
+			for (int i = 0; i < attrs.size(); i += 2) {
+				String name = attrs.get(i);
+				String value = attrs.get(i + 1);
+				customData.add(createCustomData(name, value));
+			}
+		}
 	}
 
 	private CustomData createCustomData(final String name, final String value) {
@@ -61,8 +79,8 @@ public class CDUFDocumentBuilder {
 		return data;
 	}
 
-	private String getProccesingOrg(final Book book){
-		if(book!=null && book.getLegalEntity()!=null){
+	private String getProccesingOrg(final Book book) {
+		if ((book != null) && (book.getLegalEntity() != null)) {
 			return book.getLegalEntity().getCode();
 		}
 		return "";
@@ -75,8 +93,8 @@ public class CDUFDocumentBuilder {
 		return "";
 	}
 
-	private String getStatus(final com.calypso.tk.core.Status status){
-		if(status!=null){
+	private String getStatus(final com.calypso.tk.core.Status status) {
+		if (status != null) {
 			return status.toString();
 		}
 		return "";

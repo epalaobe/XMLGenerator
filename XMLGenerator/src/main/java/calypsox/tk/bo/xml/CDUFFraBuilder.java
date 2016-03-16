@@ -38,9 +38,9 @@ public class CDUFFraBuilder extends AbstractCDUFProductBuilder {
         jaxbFra.setEndHolidayCode(getHolidayCodeTypeFromVector(paymentEndHolidays)); // required
         Vector<String> paymentHolidays = getRateIndexHolidays(fra.getRateIndex());
         jaxbFra.setPaymentHolidays(getHolidayCodeTypeFromVector(paymentHolidays)); // required
-        jaxbFra.setRate(fra.getFixedRate()); // required //nillable
-        jaxbFra.setRateIndex(getRateIndex(fra.getRateIndex())); // required //nillable
-        jaxbFra.setTenor(getTenor(fra.getRateIndex())); // required //nillable
+        jaxbFra.setRate(fra.getFixedRate()); // required 
+        jaxbFra.setRateIndex(getRateIndex(fra.getRateIndex())); // required 
+        jaxbFra.setTenor(getTenor(fra.getRateIndex())); // required 
         jaxbFra.setResetLag(getResetLag(fra.getResetOffset(), fra.getDefaultResetOffsetB(), fra.getRateIndex())); // nillable
         jaxbFra.setRateIndexSource(getRateIndexSource(fra.getRateIndex()));
         jaxbFra.setConvertBasisB(Util.toBoolean(fra.getSecCode("BASIS_CONVERT_B")));

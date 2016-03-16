@@ -139,6 +139,7 @@ public abstract class AbstractCDUFProductBuilder extends AbstractCDUFTradeBuilde
 	/**
 	 * @param leId the LegalEntity id
 	 * @return the String with LegalEntity code.
+	 * @throws CalypsoServiceException 
 	 */
 	protected String getLegalEntity(final int leId) {
 		try {
@@ -148,7 +149,6 @@ public abstract class AbstractCDUFProductBuilder extends AbstractCDUFTradeBuilde
 			}
 		} catch (CalypsoServiceException e) {
 			Log.error(this, e.getMessage());
-			return null;
 		}
 		return null;
 	}
@@ -211,25 +211,25 @@ public abstract class AbstractCDUFProductBuilder extends AbstractCDUFTradeBuilde
 		}
 		return null;
 	}
-	
+
 	/**
 	 * @param displayValue the DisplayValue object
 	 * @return the double display value
 	 */
-	protected double getDisplayValue(final com.calypso.tk.core.DisplayValue displayValue) {
+	protected Double getDisplayValue(final com.calypso.tk.core.DisplayValue displayValue) {
 		if (displayValue != null) {
 			return displayValue.get();
 		}
-		return 0.0D;
+		return null;
 	}
-	
+
 	/**
 	 * @param rateIndex the RateIndex
 	 * @return the String with RateIndex Tenor name.
 	 */
 	protected String getTenorName(final com.calypso.tk.core.Tenor tenor) {
 		if (tenor != null) {
-				return tenor.getName();
+			return tenor.getName();
 		}
 		return null;
 	}
