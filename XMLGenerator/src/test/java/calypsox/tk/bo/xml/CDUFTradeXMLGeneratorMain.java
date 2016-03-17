@@ -27,8 +27,8 @@ public class CDUFTradeXMLGeneratorMain {
 		final PricingEnv pricingEnv = DSConnection.getDefault().getRemoteMarketData().getPricingEnv("default"); // RISK
 																													// V14.0
 
-		generateMsgFromTrades(dsConnection, pricingEnv);
-		// generateMsgFromMsgs(dsConnection, pricingEnv);
+		// generateMsgFromTrades(dsConnection, pricingEnv);
+		generateMsgFromMsgs(dsConnection, pricingEnv);
 	}
 
 	private static void generateMsgFromTrades(final DSConnection dsConnection, final PricingEnv pricingEnv)
