@@ -1,27 +1,31 @@
 package calypsox.tk.bo.xml;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
+import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import com.calypso.jaxb.xml.entity10.Role;
 import com.calypso.tk.core.Action;
 import com.calypso.tk.core.Book;
+import com.calypso.tk.core.CalypsoServiceException;
+import com.calypso.tk.core.CashFlowSet;
+import com.calypso.tk.core.DateRoll;
 import com.calypso.tk.core.JDate;
 import com.calypso.tk.core.JDatetime;
 import com.calypso.tk.core.LegalEntity;
@@ -29,14 +33,13 @@ import com.calypso.tk.core.Product;
 import com.calypso.tk.core.RoundingMethod;
 import com.calypso.tk.core.Trade;
 import com.calypso.tk.core.TradeBundle;
-import com.calypso.tk.product.reconvention.ReconventionParameter;
-import com.calypso.tk.product.reconvention.ReconventionType;
-import com.calypso.tk.product.reconvention.impl.ReconventionImpl;
-import com.calypso.tk.product.reconvention.impl.ReconventionParameterImpl;
+import com.calypso.tk.marketdata.PricingEnv;
+import com.calypso.tk.product.FRA;
+import com.calypso.tk.product.Swap;
 import com.calypso.tk.refdata.RateIndex;
+import com.calypso.tk.upload.jaxb.CalypsoTrade;
+import com.calypso.tk.upload.jaxb.CashFlows;
 import com.calypso.tk.upload.jaxb.Keyword;
-import com.calypso.tk.upload.jaxb.Parameter;
-import com.calypso.tk.upload.jaxb.Parameters;
 import com.calypso.tk.upload.jaxb.TradeKeywords;
 
 /**
@@ -56,10 +59,46 @@ public class AbstractCDUFTradeBuilderTest {
 
 	/**
 	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#fillTradeHeader(com.calypso.tk.marketdata.PricingEnv, com.calypso.tk.core.Trade, com.calypso.tk.upload.jaxb.CalypsoTrade)}.
+	 * @throws CalypsoServiceException 
 	 */
 	@Test
-	public final void testFillTradeHeader() {
-		fail("Not yet implemented"); // TODO
+	public final void testFillTradeHeader() throws CalypsoServiceException, DatatypeConfigurationException {
+		
+		PricingEnv pricingEnv = new PricingEnv();
+		
+		FRA product = new FRA();
+		product.setPaymentEndDateRoll(new DateRoll());
+		product.setMaturityDate(JDate.valueOf("14/03/2016"));
+		product.setStartDate(JDate.valueOf("14/03/2017"));
+		product.setPaymentEndHolidays(new Vector<String>());
+
+		Trade trade = new Trade();
+		trade.setAction(Action.AMEND);
+		trade.setQuantity(1000.0);
+		trade.setComment("TradeComment"); 
+		trade.setRole(Role.GUARANTOR.toString());
+		trade.setSalesPerson("TradeSalesPerson");
+		trade.setTradeCurrency("EUR");
+		trade.setTraderName("TradeTraderName");
+		trade.setProduct(product);
+
+		doCallRealMethod().when(this.builder).getAction(trade.getAction());
+		doCallRealMethod().when(this.builder).getBuySell(trade.getQuantity());
+		
+		CalypsoTrade calypsoTrade = new CalypsoTrade();
+		
+		doCallRealMethod().when(this.builder).fillTradeHeader(pricingEnv, trade, calypsoTrade);
+		this.builder.fillTradeHeader(pricingEnv, trade, calypsoTrade);
+		
+		assertNotNull(calypsoTrade);
+		assertTrue(calypsoTrade.getAction().equals(Action.AMEND.toString()));
+		assertTrue(calypsoTrade.getBuySell().equals("BUY"));
+		assertTrue(calypsoTrade.getComment().equals("TradeComment"));
+		assertTrue(calypsoTrade.getCounterPartyRole().equals(Role.GUARANTOR.toString()));
+		assertTrue(calypsoTrade.getSalesPerson().equals("TradeSalesPerson"));
+		assertTrue(calypsoTrade.getTradeCurrency().equals("EUR"));
+		assertTrue(calypsoTrade.getTraderName().equals("TradeTraderName"));
+		
 	}
 
 	/**
@@ -77,6 +116,16 @@ public class AbstractCDUFTradeBuilderTest {
 		assertNotNull(country);
 		assertTrue(country.equals("SPAIN"));
 	}
+	
+	/**
+	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getCounterPartyCountry(com.calypso.tk.core.LegalEntity)}.
+	 */
+	@Test
+	public final void testGetCounterPartyCountry2() {
+		doCallRealMethod().when(this.builder).getCounterPartyCountry(null);
+		String country = this.builder.getCounterPartyCountry(null);
+		assertNull(country);
+	}
 
 	/**
 	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getAction(com.calypso.tk.core.Action)}.
@@ -92,6 +141,16 @@ public class AbstractCDUFTradeBuilderTest {
 
 		assertNotNull(action);
 		assertTrue(action.equals("AMEND"));
+	}
+	
+	/**
+	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getAction(com.calypso.tk.core.Action)}.
+	 */
+	@Test
+	public final void testGetAction2() {
+		doCallRealMethod().when(this.builder).getAction(null);
+		String action = this.builder.getAction(null);
+		assertNull(action);
 	}
 
 	/**
@@ -112,6 +171,16 @@ public class AbstractCDUFTradeBuilderTest {
 		assertTrue(jDateTradeDate.equals(jDate));
 	}
 
+	/**
+	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getTradeDateJDate(com.calypso.tk.core.JDatetime)}.
+	 */
+	@Test
+	public final void testGetTradeDateJDate2() {
+		doCallRealMethod().when(this.builder).getTradeDateJDate(null);
+		JDate jDateTradeDate = this.builder.getTradeDateJDate(null);
+		assertNull(jDateTradeDate);
+	}
+	
 	/**
 	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getTradeKeywords(com.calypso.tk.core.Trade)}.
 	 */
@@ -134,45 +203,25 @@ public class AbstractCDUFTradeBuilderTest {
 		assertNotNull(listaKeywords.get(0));
 		assertEquals(listaKeywords.get(0).getKeywordValue(), "KeywordValue");
 	}
-
+	
 	/**
-	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getReconventionList(com.calypso.tk.core.Product)}.
+	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getTradeKeywords(com.calypso.tk.core.Trade)}.
 	 */
 	@Test
-	public final void testGetReconventionList() {
-		fail("Not yet implemented"); // TODO
-	}
+	public final void testGetTradeKeywords2() {
+		Trade trade = new Trade();
+		trade.setKeywords(null);
 
-	/**
-	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getReconventionParameters(com.calypso.tk.product.reconvention.Reconvention)}.
-	 */
-	@Test
-	public final void testGetReconventionParameters() {
+		doCallRealMethod().when(this.builder).getTradeKeywords(trade);
 
-		ReconventionImpl reconvention = spy(new ReconventionImpl());
-		List<ReconventionParameter<?>> reconventionParams = new ArrayList<ReconventionParameter<?>>();
+		TradeKeywords tradeKeywords = this.builder.getTradeKeywords(trade);
 
-		ReconventionParameterImpl<String> reconventionParam = new ReconventionParameterImpl<String>("TestName", "TestDescription");
-		ReconventionParameterImpl.setValue(reconventionParam, "TestValue");
-		reconventionParams.add(reconventionParam);
+		assertNotNull(tradeKeywords);
 
-		when(reconvention.getReconventionParameters()).thenReturn(reconventionParams);
+		List<Keyword> listaKeywords = tradeKeywords.getKeyword();
 
-		doCallRealMethod().when(this.builder).getReconventionParameters(reconvention);
-
-		Parameters returnedParams = this.builder.getReconventionParameters(reconvention);
-
-		assertNotNull(returnedParams);
-
-		List<Parameter> listParameter = returnedParams.getParameter();
-
-		assertNotNull(listParameter);
-
-		for(Parameter parameter : listParameter){
-			if(parameter.getParameterName().equals("TestName")){
-				assertEquals("TestValue", parameter.getParameterValue());
-			}
-		}
+		assertNotNull(listaKeywords);
+		assertTrue(listaKeywords.isEmpty());
 	}
 
 	/**
@@ -180,7 +229,46 @@ public class AbstractCDUFTradeBuilderTest {
 	 */
 	@Test
 	public final void testGetCashflows() {
-		fail("Not yet implemented"); // TODO
+		PricingEnv pricingEnv = new PricingEnv();
+		FRA product = new FRA();
+		product.setPaymentEndDateRoll(new DateRoll());
+		product.setMaturityDate(JDate.valueOf("14/03/2016"));
+		product.setStartDate(JDate.valueOf("14/03/2017"));
+		product.setPaymentEndHolidays(new Vector<String>());
+		
+		CashFlows cfSet = null;
+		
+		doCallRealMethod().when(this.builder).getCashflows(pricingEnv, product);
+		cfSet = this.builder.getCashflows(pricingEnv, product);
+		
+		assertNotNull(cfSet);
+		assertTrue(cfSet.getCashFlow().isEmpty());
+	}
+	
+	/**
+	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getCashflows(com.calypso.tk.marketdata.PricingEnv, com.calypso.tk.core.Product)}.
+	 */
+	@Test
+	public final void testGetCashflows2() {
+		PricingEnv pricingEnv = new PricingEnv();
+		
+		CashFlowSet cashFlowSet = new CashFlowSet();
+		com.calypso.tk.core.CashFlow cashFlow = new com.calypso.tk.core.CashFlow();
+		cashFlow.setAmount(1000.0);
+		cashFlow.setSubId(1);
+		cashFlowSet.add(cashFlow);
+		
+		Swap product = new Swap();
+		product.setCustomFlowsB(true);
+		product.setFlows(cashFlowSet);
+
+		CashFlows cfSet = null;
+		
+		doCallRealMethod().when(this.builder).getCashflows(pricingEnv, product);
+		cfSet = this.builder.getCashflows(pricingEnv, product);
+		
+		assertNotNull(cfSet.getCashFlow());
+		assertEquals((Double)1000.0 ,cfSet.getCashFlow().get(0).getAmount());
 	}
 
 	/**
@@ -232,6 +320,16 @@ public class AbstractCDUFTradeBuilderTest {
 	}
 
 	/**
+	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getBook(com.calypso.tk.core.Book)}.
+	 */
+	@Test
+	public final void testGetBook2() {
+		doCallRealMethod().when(this.builder).getBook(null);
+		String bookName = this.builder.getBook(null);
+		assertNull(bookName);
+	}
+	
+	/**
 	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getTradeBundle(com.calypso.tk.core.TradeBundle)}.
 	 */
 	@Test
@@ -245,6 +343,16 @@ public class AbstractCDUFTradeBuilderTest {
 
 		assertNotNull(tradeBundleName);
 		assertTrue(tradeBundleName.equals("TestName"));
+	}
+	
+	/**
+	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getTradeBundle(com.calypso.tk.core.TradeBundle)}.
+	 */
+	@Test
+	public final void testGetTradeBundle2() {
+		doCallRealMethod().when(this.builder).getTradeBundle(null);
+		String tradeBundleName = this.builder.getTradeBundle(null);
+		assertNull(tradeBundleName);
 	}
 
 	/**
@@ -263,6 +371,16 @@ public class AbstractCDUFTradeBuilderTest {
 		assertNotNull(tradeBundleTypeName);
 		assertTrue(tradeBundleTypeName.equals("TestType"));
 	}
+	
+	/**
+	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getTradeBundleType(com.calypso.tk.core.TradeBundle)}.
+	 */
+	@Test
+	public final void testGetTradeBundleType2() {
+		doCallRealMethod().when(this.builder).getTradeBundleType(null);
+		String tradeBundleTypeName = this.builder.getTradeBundleType(null);
+		assertNull(tradeBundleTypeName);
+	}
 
 	/**
 	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getTradeBundleOneMessage(com.calypso.tk.core.TradeBundle)}.
@@ -280,6 +398,16 @@ public class AbstractCDUFTradeBuilderTest {
 		assertNotNull(tradeBundle1Msg);
 		assertTrue(tradeBundle1Msg);
 	}
+	
+	/**
+	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getTradeBundleOneMessage(com.calypso.tk.core.TradeBundle)}.
+	 */
+	@Test
+	public final void testGetTradeBundleOneMessage2() {
+		doCallRealMethod().when(this.builder).getTradeBundleOneMessage(null);
+		boolean tradeBundle1Msg = this.builder.getTradeBundleOneMessage(null);
+		assertFalse(tradeBundle1Msg);
+	}
 
 	/**
 	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getCounterParty(com.calypso.tk.core.LegalEntity)}.
@@ -296,6 +424,16 @@ public class AbstractCDUFTradeBuilderTest {
 		assertNotNull(counterPartyName);
 		assertTrue(counterPartyName.equals("TestName"));
 	}
+	
+	/**
+	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getCounterParty(com.calypso.tk.core.LegalEntity)}.
+	 */
+	@Test
+	public final void testGetCounterParty2() {
+		doCallRealMethod().when(this.builder).getCounterParty(null);
+		String counterPartyName = this.builder.getCounterParty(null);
+		assertNull(counterPartyName);
+	}
 
 	/**
 	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getRoundingMethod(com.calypso.tk.core.RoundingMethod)}.
@@ -311,21 +449,15 @@ public class AbstractCDUFTradeBuilderTest {
 		assertNotNull(roundingMethodName);
 		assertTrue(roundingMethodName.equals("NEAREST"));
 	}
-
+	
 	/**
-	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getReconventionType(com.calypso.tk.product.reconvention.ReconventionType)}.
+	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getRoundingMethod(com.calypso.tk.core.RoundingMethod)}.
 	 */
 	@Test
-	public final void testGetReconventionType() {
-
-		ReconventionType reconventionType = ReconventionType.Flipper;
-
-		doCallRealMethod().when(this.builder).getReconventionType(reconventionType);
-
-		String reconventionTypeName = this.builder.getReconventionType(reconventionType);
-
-		assertNotNull(reconventionTypeName);
-		assertTrue(reconventionTypeName.equals(ReconventionType.Flipper.toString()));
+	public final void testGetRoundingMethod2() {
+		doCallRealMethod().when(this.builder).getRoundingMethod(null);
+		String roundingMethodName = this.builder.getRoundingMethod(null);
+		assertNull(roundingMethodName);
 	}
 
 	/** 
@@ -354,6 +486,18 @@ public class AbstractCDUFTradeBuilderTest {
 		assertNotNull(holidayCode.getHoliday().get(0));
 		assertEquals("TestHoliday", holidayCode.getHoliday().get(0));
 	}
+	
+	/** 
+	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getHolidayCode(com.calypso.tk.core.Product)}.
+	 */
+	@Test
+	public final void testGetHolidayCode2() {
+		FRA fra = new FRA();
+		doCallRealMethod().when(this.builder).getHolidayCode(fra);
+		com.calypso.tk.upload.jaxb.HolidayCode holidayCode = this.builder.getHolidayCode(fra);
+		assertNull(holidayCode);
+	}
+
 
 	/**
 	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getXmlGregorianCalendarFromDate(com.calypso.tk.core.JDate)}.
@@ -369,6 +513,26 @@ public class AbstractCDUFTradeBuilderTest {
 		assertNotNull(xmlGregorian);
 		assertNotNull(xmlGregorian.getDay());
 		assertEquals(date.getDayOfMonth(), xmlGregorian.getDay());
+	}
+	
+	/**
+	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getXmlGregorianCalendarFromDate(com.calypso.tk.core.JDate)}.
+	 */
+	@Test
+	public final void testGetXmlGregorianCalendarFromDate2() {
+		doCallRealMethod().when(this.builder).getXmlGregorianCalendarFromDate(null);
+		XMLGregorianCalendar xmlGregorian = this.builder.getXmlGregorianCalendarFromDate(null);
+		assertNull(xmlGregorian);
+	}
+	
+	/**
+	 * Test method for {@link calypsox.tk.bo.xml.AbstractCDUFTradeBuilder#getXmlGregorianCalendarFromDate(com.calypso.tk.core.JDate)}.
+	 */
+	@Test
+	public final void testGetXmlGregorianCalendarFromDate3() {
+		doCallRealMethod().when(this.builder).getXmlGregorianCalendarFromDate(null);
+		XMLGregorianCalendar xmlGregorian = this.builder.getXmlGregorianCalendarFromDate(null);
+		assertNull(xmlGregorian);
 	}
 
 	/**

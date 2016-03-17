@@ -34,14 +34,18 @@ public class CDUFDocumentBuilderTest {
 
 		Trade trade = new Trade();
 		trade.setProduct(new FRA());
-		trade.setStatus(Status.valueOf("NONE"));
-
+		trade.setStatus(Status.valueOf("NONE"));	
+		
+		
 		BOMessage msg = new BOMessage();
 		msg.setAction(Action.AMEND);
 
 		CDUFDocumentBuilder builder = new CDUFDocumentBuilder();
 
 		CalypsoUploadDocument calypsoDocument = builder.buildCalypsoDocument(mockedPENV, trade, msg);
+		
+		trade.setStatus(null);
+		builder.buildCalypsoDocument(mockedPENV, trade, msg);
 
 		assertNotNull(calypsoDocument);
 		assertFalse(calypsoDocument.getCalypsoTrade().isEmpty());
@@ -58,4 +62,6 @@ public class CDUFDocumentBuilderTest {
 			}
 		}
 	}
+	
+	
 }

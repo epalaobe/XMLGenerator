@@ -38,7 +38,7 @@ public class CDUFFraBuilderTest {
 		
 		CalypsoTrade calypsoTrade = new CalypsoTrade();
 		
-		assertTrue(calypsoTrade.getTradeNotional()==0);
+		assertEquals((Double)0.0 , (Double)calypsoTrade.getTradeNotional());
 		assertNull(calypsoTrade.getStartDate());
 		
 		CDUFFraBuilder builder = new CDUFFraBuilder();
@@ -46,7 +46,7 @@ public class CDUFFraBuilderTest {
 		
 		assertNotNull(calypsoTrade.getTradeNotional());
 		assertNotNull(calypsoTrade.getStartDate());
-		assertTrue(calypsoTrade.getTradeNotional()==1000.0);
+		assertEquals((Double)1000.0, (Double)calypsoTrade.getTradeNotional());
 		assertEquals(jdate.getDayOfMonth(), calypsoTrade.getStartDate().getDay());
 	}
 

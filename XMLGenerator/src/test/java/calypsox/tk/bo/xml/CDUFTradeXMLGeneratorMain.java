@@ -23,7 +23,7 @@ public class CDUFTradeXMLGeneratorMain {
 	private static String SQL = "product_desc.product_type  IN (\'TYPE\')";
 
 	public static void main(final String[] args) throws Exception {
-		DSConnection dsConnection = ConnectionUtil.connect(args, "MainEntry");
+		DSConnection dsConnection = ConnectionUtil.connect(args, "MainEntry"); 
 		final PricingEnv pricingEnv = DSConnection.getDefault().getRemoteMarketData().getPricingEnv("default"); // RISK
 																													// V14.0
 
